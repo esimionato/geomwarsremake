@@ -1,40 +1,69 @@
 package geomwarsremake;
 
-import java.io.FileNotFoundException;
-import java.io.PrintStream;
-
 import geomwarsremake.states.*;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
 import org.newdawn.slick.AppGameContainer;
 import org.newdawn.slick.GameContainer;
+import org.newdawn.slick.Input;
 import org.newdawn.slick.Music;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.state.StateBasedGame;
-import org.newdawn.slick.util.Log;
 
 
 public class GeomWarsRemake extends StateBasedGame{
   static Logger logger = Logger.getLogger(GeomWarsRemake.class);
   
 //  private LoadingState loading;
-//  private StandardIngameState std_ingame;
+  private IngameState ingame;
   private MenuState menu;
 //  private ExitState exit;
 //  private HelpState help;
   private Music music;
   
+  private boolean showFPS = true;
+  
 
   public GeomWarsRemake(String name) {
     super(name);
-    // TODO Auto-generated constructor stub
+    
+    
   }
 
   @Override
-  public void initStatesList(GameContainer arg0) throws SlickException {
-    // TODO Auto-generated method stub
+  public void initStatesList(GameContainer container) throws SlickException {
+    container.setShowFPS(showFPS);
 
+    container.setSoundOn(false);
+    container.setMusicOn(false);
+    
+    
+ /* //add loading state and enter it
+  loading = new LoadingState(this);
+  addState(loading);
+  loading.setStarted(true);*/
+  
+  //add menu state
+  /*menu = new MenuState(this);
+  addState(menu);*/
+  
+  //add ingame state
+  ingame = new IngameState(this);
+  addState(ingame);
+  ingame.enter(container, this);
+  ingame.startState(container);
+  
+  /*//add help state
+  help = new HelpState(this);
+  addState(help);*/    
+  }
+  
+  public void globalKeyPressed(int key, char c) {
+    if (key == Input.KEY_F) {
+      showFPS = !showFPS;
+      getContainer().setShowFPS(showFPS);
+    }
   }
   
   /**
@@ -55,18 +84,17 @@ public class GeomWarsRemake extends StateBasedGame{
       //An applet would use the AppletGameContainer.
       GeomWarsRemake g = new GeomWarsRemake("GeomWarsRemake");
       AppGameContainer container = new AppGameContainer(g);
+      //container.setTargetFrameRate(60);
       //TODO: xml properties: display size
       container.setDisplayMode(800, 600, true);
       try {
-      container.start();
-      } catch (SlickException e)
-      {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
+        container.start();
+      } catch (SlickException e){
+        logger.fatal("game start failed",e);
       }
     }
     catch (Exception e) {
-      e.printStackTrace();
+      logger.fatal("game creation failed",e);
     }
 
   }
