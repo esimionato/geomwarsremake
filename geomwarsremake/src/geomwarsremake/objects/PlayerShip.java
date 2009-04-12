@@ -1,12 +1,14 @@
 package geomwarsremake.objects;
 
-public class PlayerShip {
-  public float x = 0;
-  public float y = 0;
+public class PlayerShip extends GwrObject{
   private int directionX = 0;
   private int directionY = 0;
-  private int speed = 1;
-  private  int aimDirection;
+  
+  public PlayerShip(){
+    setX(0);
+    setY(0);
+    setSpeed(0.3f);
+  }
   
   //moovment control
   public int getDirectionX() {
@@ -20,9 +22,6 @@ public class PlayerShip {
   }
   public void setDirectionX(int i) {
     directionX = i;
-  }
-  public int getSpeed() {
-    return speed;
   }
 
 }

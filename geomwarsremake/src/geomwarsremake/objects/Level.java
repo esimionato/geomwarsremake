@@ -15,5 +15,10 @@ public class Level {
     pship = new PlayerShip();
     
   }
+  
+  /**
+   * Enemies generator.
+   * 
+   */
 
 }

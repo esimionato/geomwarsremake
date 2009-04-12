@@ -43,7 +43,7 @@ public class IngameState extends GwarState {
     
     //draw player
     g.setColor(Color.green);
-    g.fillOval(level.pship.x+200, level.pship.y+200, 10, 10);
+    g.fillOval(level.pship.getX()+200, level.pship.getY()+200, 10, 10);
     
     
     //draw effects
@@ -56,8 +56,8 @@ public class IngameState extends GwarState {
     
     //move player
     
-    level.pship.x = level.pship.x+level.pship.getSpeed()*level.pship.getDirectionX();
-    level.pship.y = level.pship.y+level.pship.getSpeed()*level.pship.getDirectionY();
+    level.pship.setX(level.pship.getX()+level.pship.getSpeed()*level.pship.getDirectionX());
+    level.pship.setY(level.pship.getY()+level.pship.getSpeed()*level.pship.getDirectionY());
     //move enemies
     
     //move shots

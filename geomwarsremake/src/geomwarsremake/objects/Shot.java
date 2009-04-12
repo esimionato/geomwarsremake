@@ -1,5 +1,5 @@
 package geomwarsremake.objects;
 
-public class Shot {
+public class Shot extends GwrObject{
 
 }

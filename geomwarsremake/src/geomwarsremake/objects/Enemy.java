@@ -1,5 +1,5 @@
 package geomwarsremake.objects;
 
-public class Enemy {
+public class Enemy extends GwrObject{
 
 }
