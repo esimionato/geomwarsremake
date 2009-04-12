@@ -89,21 +89,20 @@ public class IngameState extends GwarState {
     }
     if(key == Input.KEY_W)
     {
-      level.pship.setDirectionY(-1);
-    }
-    if(key == Input.KEY_S)
-    {
-      level.pship.setDirectionY(1);
-    }
-    if(key == Input.KEY_D)
-    {
-      level.pship.setDirectionX(1);
+      level.pship.wantDirectionUP(true);
     }
     if(key == Input.KEY_A)
     {
-      level.pship.setDirectionX(-1);
+      level.pship.wantDirectionLEFT(true);
     }
-
+    if(key == Input.KEY_D)
+    {
+      level.pship.wantDirectionRIGHT(true);
+    }
+    if(key == Input.KEY_S)
+    {
+      level.pship.wantDirectionDOWN(true);
+    }
     if (key == Input.KEY_ESCAPE)
     {
       System.exit(0);
@@ -116,20 +115,20 @@ public class IngameState extends GwarState {
     super.keyReleased(key, c);
     if(key == Input.KEY_W)
     {
-      level.pship.setDirectionY(0);
+      level.pship.wantDirectionUP(false);
     }
     if(key == Input.KEY_A)
     {
-      level.pship.setDirectionX(0);
+      level.pship.wantDirectionLEFT(false);
     }
     if(key == Input.KEY_D)
     {
-      level.pship.setDirectionX(0);
+      level.pship.wantDirectionRIGHT(false);
     }
     if(key == Input.KEY_S)
-      {
-        level.pship.setDirectionY(0);
-      }
+    {
+      level.pship.wantDirectionDOWN(false);
+    }
     if (key == Input.KEY_ESCAPE)
     {
       System.exit(0);
