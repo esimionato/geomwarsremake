@@ -1,9 +1,11 @@
 package geomwarsremake.objects;
 
+import org.newdawn.slick.geom.Circle;
+
 public class GwrObject {
-  //coordinates
-  private float x ,y;
-  //specify where object is faced
+  //Object position
+  private Circle circle;
+  //specify where object is faced (angle)
   private float faceAllignment = 0;
   //basic speed
   private float speed = 1;
@@ -57,17 +59,11 @@ public class GwrObject {
   public int getDirectionY() {
     return directionY;
   }
-  public float getX() {
-    return x;
+  public Circle getCircle(){
+	  return circle;
   }
-  public void setX(float x) {
-    this.x = x;
-  }
-  public float getY() {
-    return y;
-  }
-  public void setY(float y) {
-    this.y = y;
+  public void setCircle(Circle circle){
+	  this.circle = circle;
   }
   public float getFaceAllignment() {
     return faceAllignment;

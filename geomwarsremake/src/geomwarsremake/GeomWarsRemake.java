@@ -86,7 +86,7 @@ public class GeomWarsRemake extends StateBasedGame{
       AppGameContainer container = new AppGameContainer(g);
       //container.setTargetFrameRate(60);
       //TODO: xml properties: display size
-      container.setDisplayMode(800, 600, true);
+      container.setDisplayMode(1024, 768, true);
       try {
         container.start();
       } catch (SlickException e){
