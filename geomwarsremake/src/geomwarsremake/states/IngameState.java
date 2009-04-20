@@ -18,6 +18,10 @@ public class IngameState extends GwarState {
 	private Level level;
 	public static final int id = 3;
 	float mouseX,mouseY;
+	/** GameContainer width */
+	float width;
+	/** GameContainer height */
+	float height;
 
 	public IngameState(GeomWarsRemake ctx) {
 		super(ctx);
@@ -37,22 +41,33 @@ public class IngameState extends GwarState {
 		g.setColor(Color.black);
 		//g.clear();
 
+		//Position the map
+		g.translate(getTranslateX(), getTranslateY());
+		
+		//Draw map area
+		g.setColor(Color.white);
+		g.drawRect(0, 0, 800, 600);
+		
 
 		//draw enemies
 
 		//draw shots
+		g.setColor(Color.blue);
+		for(Shot shot : level.shots){
+			g.fill(shot.getCircle());
+		}
 
 		//draw player
 		g.setColor(Color.green);
-
 		g.fill(level.pship.getCircle());
+		
 		//draw direction
 		g.setColor(Color.red);
 		Double angle = (double)level.pship.getFaceAllignment();
 		float dirX1 = level.pship.getCircle().getCenterX();
 		float dirY1 = level.pship.getCircle().getCenterY();
-		float dirX2 = dirX1+(float)(10*Math.cos(angle));
-		float dirY2 = dirY1+(float)(10*Math.sin(angle));
+		float dirX2 = dirX1+(float)(20*Math.cos(angle));
+		float dirY2 = dirY1+(float)(20*Math.sin(angle));
 		g.drawLine(dirX1, dirY1, dirX2, dirY2);
 
 
@@ -73,24 +88,35 @@ public class IngameState extends GwarState {
 	}
 
 	public void updateState(GameContainer container, int delta){
-
+		Input input = container.getInput();
 		//check mouse controls
-
+		
 
 		//move player
-		float deltaX = level.pship.getSpeed()*level.pship.getDirectionX()*delta;
-		float deltaY = level.pship.getSpeed()*level.pship.getDirectionY()*delta;
-		float shipX = level.pship.getCircle().getX() + deltaX;
-		float shipY = level.pship.getCircle().getY() + deltaY;
-		level.pship.getCircle().setLocation(shipX, shipY);
+		level.pship.updatePosition(delta);
+		
 		//Update player direction
-		Input input = container.getInput();
-		int x = input.getMouseX() - (int)level.pship.getCircle().getCenterX();
-		int y = input.getMouseY() - (int)level.pship.getCircle().getCenterY();
+		float x = input.getMouseX() - width/2;
+		float y = input.getMouseY() - height/2;
 		level.pship.setFaceAllignment((float)findAngle(x, y));
+		
+		//Create shots
+		if(level.shots.size() > 20){ 
+			level.shots.clear(); //Too much lag currently. The shots never disappear.
+		}
+		level.pship.updateShotTime(delta);
+		if(input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)){
+			for(Shot shot : level.pship.createShot()){
+				level.shots.add(shot);
+			}
+		}
+		
 		//move enemies
 
 		//move shots
+		for(Shot shot : level.shots){
+			shot.updatePosition(delta);
+		}
 
 		//calculate hits
 
@@ -168,6 +194,9 @@ public class IngameState extends GwarState {
 	@Override
 	public void initState(GameContainer c) throws SlickException {
 		setBackground(new Color(87, 146, 186));  
+		c.setMaximumLogicUpdateInterval(50);
+		width = c.getWidth();
+		height = c.getHeight();
 	}
 
 	/**
@@ -197,6 +226,17 @@ public class IngameState extends GwarState {
 		}
 		return theta;
 	}
+	
+	/**
+	 * The translation that we operate on the graphics object on the x axis
+	 * @return The x value of the translation
+	 */
+	private float getTranslateX(){
+		return -level.pship.getCircle().getCenterX() + width/2;
+	}
 
+	private float getTranslateY(){
+		return -level.pship.getCircle().getCenterY() + height/2;
+	}
 
 }
