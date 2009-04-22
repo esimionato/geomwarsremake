@@ -17,7 +17,7 @@ public class IngameState extends GwarState {
 	static Logger logger = Logger.getLogger(IngameState.class);
 	private Level level;
 	public static final int id = 3;
-	float mouseX,mouseY;
+	//float mouseX,mouseY;
 	/** GameContainer width */
 	float width;
 	/** GameContainer height */
@@ -81,11 +81,11 @@ public class IngameState extends GwarState {
 		g.setColor(Color.black);
 	}
 
-	//Still useful? Why we have mouseX and mouseY.
+	/*//Still useful? Why we have mouseX and mouseY.
 	public void mouseMoved(int oldx, int oldy, int newx, int newy) {
 		mouseX = newx-level.pship.getCircle().getCenterX();
 		mouseY = newy-level.pship.getCircle().getCenterY();
-	}
+	}*/
 
 	public void updateState(GameContainer container, int delta){
 		Input input = container.getInput();
@@ -110,6 +110,10 @@ public class IngameState extends GwarState {
 				level.shots.add(shot);
 			}
 		}
+		
+		if(input.isMouseButtonDown(Input.MOUSE_RIGHT_BUTTON)){
+      level.pship.wantUseBomb();
+    }
 		
 		//move enemies
 

@@ -9,6 +9,7 @@ public class PlayerShip extends GwrObject{
 	//temp weapon
 	private int weaponInterval = 200;// 200 = one second
 	int delayBeforeNextShot = 0;
+	private int bombs = 3;
 
 	public PlayerShip(){
 		setCircle(new Circle(400, 400, 10));
@@ -71,6 +72,12 @@ public class PlayerShip extends GwrObject{
 		} else {
 			directionX++;
 		} 
+	}
+	
+	public void wantUseBomb() {
+	  if (bombs > 1) {
+	    //activate it
+	  }
 	}
 
 }

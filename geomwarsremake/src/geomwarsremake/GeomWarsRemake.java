@@ -84,7 +84,7 @@ public class GeomWarsRemake extends StateBasedGame{
       //An applet would use the AppletGameContainer.
       GeomWarsRemake g = new GeomWarsRemake("GeomWarsRemake");
       AppGameContainer container = new AppGameContainer(g);
-      //container.setTargetFrameRate(60);
+      container.setTargetFrameRate(60);
       //TODO: xml properties: display size
       container.setDisplayMode(1024, 768, true);
       try {
