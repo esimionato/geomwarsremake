@@ -1,11 +1,16 @@
 package geomwarsremake.states;
 
+import java.util.ArrayList;
+
 import geomwarsremake.GeomWarsRemake;
 
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
+import org.newdawn.slick.Image;
+import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
+import org.newdawn.slick.SpriteSheet;
 import org.newdawn.slick.gui.AbstractComponent;
 import org.newdawn.slick.gui.ComponentListener;
 import org.newdawn.slick.state.StateBasedGame;
@@ -14,6 +19,8 @@ import org.newdawn.slick.state.StateBasedGame;
 public class MenuState extends GwarState implements ComponentListener {
   
   public static final int id = 1;
+  private SpriteSheet buttonsSS;
+  private ArrayList <GwarButton> buttonList = new ArrayList<GwarButton>(); 
 
   public MenuState(GeomWarsRemake ctx) {
     super(ctx);
@@ -31,6 +38,10 @@ public class MenuState extends GwarState implements ComponentListener {
   
   public void keyPressed(int key, char c) {
     super.keyPressed(key, c);
+    if (key == Input.KEY_ESCAPE)
+    {
+      System.exit(0);
+    }
   }
 
   @Override
@@ -42,20 +53,65 @@ public class MenuState extends GwarState implements ComponentListener {
 
   @Override
   public void updateState(GameContainer c, int delta) {
-    // TODO Auto-generated method stub
+    Input input = c.getInput();
+    float mx = input.getMouseX();
+    float my = input.getMouseY();
+    
+    if(input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)){
+      String bact="none";
+      for(GwarButton b : buttonList) {
+        bact = b.collide(mx, my);
+        if (bact.equals("exit")) {
+          System.exit(0);
+          break;
+        } else if (bact.equals("newGame")) {
+          getContext().enterState(IngameState.id,
+              this.getExitTransition(),
+              this.getEnterTransition()); 
+          break;
+        } else if (bact.equals("options")) {
+          break;
+        }
+      }
+      logger.debug("main menu MRight. bact:"+bact);
+    }
     
   }
 
   @Override
   public void initState(GameContainer c) throws SlickException {
-    // TODO Auto-generated method stub
-    
+    //load buttons
+    buttonsSS = new SpriteSheet(new Image("/resources/menu_temp.png"), 150,64);
+    GwarButton newGameButton = new GwarButton(buttonsSS.getSprite(0, 0),"newGame");
+    newGameButton.posX = 200;
+    newGameButton.posY = 200;
+    buttonList.add(newGameButton);
+    GwarButton optionsButton = new GwarButton(buttonsSS.getSprite(0, 2),"options");
+    optionsButton.posX = 200;
+    optionsButton.posY = 300;
+    buttonList.add(optionsButton);
+    GwarButton exitButton = new GwarButton(buttonsSS.getSprite(0, 1),"exit");
+    exitButton.posX = 200;
+    exitButton.posY = 400;
+    buttonList.add(exitButton);
+
   }
+  
 
   @Override
   public void renderState(GameContainer c, Graphics g) {
-    g.setColor(Color.red);
-    g.fillRect(100, 100, 100, 100);
+    
+    //draw grid
+    g.setColor(Color.green);
+    for (int i=0; i<2000;i+=100) {
+      g.drawLine(0, i, 2000, i);
+      g.drawLine(i, 0, i, 2000);
+    }
+    
+    //draw buttons
+    for(GwarButton b : buttonList) {
+      g.drawImage(b.image, b.posX, b.posY);
+    }
     
   }
 

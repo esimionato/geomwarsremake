@@ -9,7 +9,10 @@ import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.Music;
 import org.newdawn.slick.SlickException;
+import org.newdawn.slick.state.GameState;
 import org.newdawn.slick.state.StateBasedGame;
+import org.newdawn.slick.state.transition.Transition;
+import org.newdawn.slick.util.Log;
 
 
 public class GeomWarsRemake extends StateBasedGame{
@@ -39,24 +42,26 @@ public class GeomWarsRemake extends StateBasedGame{
     container.setMusicOn(false);
     
     
- /* //add loading state and enter it
-  loading = new LoadingState(this);
-  addState(loading);
-  loading.setStarted(true);*/
-  
-  //add menu state
-  /*menu = new MenuState(this);
-  addState(menu);*/
-  
-  //add ingame state
-  ingame = new IngameState(this);
-  addState(ingame);
-  ingame.enter(container, this);
-  ingame.startState(container);
-  
-  /*//add help state
-  help = new HelpState(this);
-  addState(help);*/    
+   /* //add loading state and enter it
+    loading = new LoadingState(this);
+    addState(loading);
+    loading.setStarted(true);*/
+    
+    //add menu state
+    menu = new MenuState(this);
+    addState(menu);
+    menu.enter(container, this);
+    menu.startState(container);
+    
+    //add ingame state
+    ingame = new IngameState(this);
+    addState(ingame);
+    //ingame.enter(container, this);
+    //ingame.startState(container);
+    
+    /*//add help state
+    help = new HelpState(this);
+    addState(help);*/    
   }
   
   public void globalKeyPressed(int key, char c) {
@@ -97,6 +102,23 @@ public class GeomWarsRemake extends StateBasedGame{
       logger.fatal("game creation failed",e);
     }
 
+  }
+  
+  public void enterState(int id, Transition t1, Transition t2) {
+    GameState t = getState(id);
+    if (t instanceof GwarState) {
+      GwarState s = ((GwarState)t);
+      if (!s.isStarted()) {
+        s.setStarted(true);
+        try {
+          s.startState(getContainer());
+        }
+        catch (SlickException e) {
+          Log.error(e);
+        }
+      }
+    }
+    super.enterState(id, t1, t2);
   }
 
 }

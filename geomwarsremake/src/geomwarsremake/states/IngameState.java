@@ -40,9 +40,12 @@ public class IngameState extends GwarState {
 		//draw background
 		g.setColor(Color.black);
 		//g.clear();
+		
+
 
 		//Position the map
 		g.translate(getTranslateX(), getTranslateY());
+		
 		
 		//Draw map area
 		g.setColor(Color.white);
@@ -74,6 +77,8 @@ public class IngameState extends GwarState {
 		//draw effects
 
 		//draw GUI
+		//set translation back
+		g.translate(-getTranslateX(), -getTranslateY());
 		g.setColor(Color.green);
 		g.drawString("face "+level.pship.getFaceAllignment(), 20, 20);
 		//g.drawString("mouseX "+mouseX, 300, 20);
