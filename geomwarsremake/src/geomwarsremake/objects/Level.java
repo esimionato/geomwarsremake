@@ -21,6 +21,8 @@ public class Level {
     enemies.add(new BlueLozenge(400,0));
   }
   
+  
+  
   /**
    * Enemies generator.
    * 

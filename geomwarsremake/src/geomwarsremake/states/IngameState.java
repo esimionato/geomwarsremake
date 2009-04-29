@@ -8,6 +8,7 @@ import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Input;
+import org.newdawn.slick.Music;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.particles.ConfigurableEmitter;
 import org.newdawn.slick.state.StateBasedGame;
@@ -24,6 +25,8 @@ public class IngameState extends GwarState {
 	float width;
 	/** GameContainer height */
 	float height;
+	private boolean soundEnabled = false;
+	private Music music;
 
 	public IngameState(GeomWarsRemake ctx) {
 		super(ctx);
@@ -43,6 +46,7 @@ public class IngameState extends GwarState {
 		c.setMaximumLogicUpdateInterval(50);
 		width = c.getWidth();
 		height = c.getHeight();
+		music = new Music("resources/sounds/drum.ogg");
 	}
 
 	@Override
@@ -73,6 +77,7 @@ public class IngameState extends GwarState {
 		g.setColor(Color.blue);
 		for(Shot shot : level.shots){
 			g.draw(shot.getCircle());
+			g.drawString(""+shot.timeRemain, shot.getCircle().getMinX(), shot.getCircle().getMinY());
 		}
 
 		//draw player
@@ -96,6 +101,7 @@ public class IngameState extends GwarState {
 		g.translate(-getTranslateX(), -getTranslateY());
 		g.setColor(Color.green);
 		g.drawString("face "+level.pship.getFaceAllignment(), 20, 20);
+		g.drawString("Score: "+level.pship.getScores(), 900, 700);
 		//g.drawString("mouseX "+mouseX, 300, 20);
 		//g.drawString("mouseY "+mouseY, 300, 40);
 		g.setColor(Color.black);
@@ -114,10 +120,11 @@ public class IngameState extends GwarState {
 		float y = input.getMouseY() - height/2;
 		level.pship.setFaceAllignment((float)GeomWarUtil.findAngle(x, y));
 		
-		//Create shots
+		/*//Create shots
 		if(level.shots.size() > 20){ 
 			level.shots.clear(); //Too much lag currently. The shots never disappear.
-		}
+		}*/
+		
 		level.pship.updateShotTime(delta);
 		if(input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)){
 			for(Shot shot : level.pship.createShot()){
@@ -132,16 +139,37 @@ public class IngameState extends GwarState {
 		//move enemies
 		for(Enemy enemy : level.enemies){
 			enemy.updatePosition(delta, level);
+			
 		}
 
 		//move shots
 		for(Shot shot : level.shots){
 			shot.updatePosition(delta, level);
+			if(shot.reduceLiveTime(0.02f)<0){
+			  shot.setDestroyed();
+			}
+		}
+		
+		//remove destroyed shots
+		for (int i = 0; i<level.shots.size();i++){
+		  if (level.shots.get(i).getDestroyed()){
+		    level.shots.remove(i);
+		    i--;
+		  }
 		}
 
 		//calculate hits
 
 		//kill enemies
+		
+		//remove emenies from level
+		for(int i = 0; i<level.enemies.size();i++) {
+		  if (level.enemies.get(i).isDead()) {
+		    level.enemies.remove(i);
+		    i--;
+		  }
+		}
+		
 
 		//other
 
@@ -154,6 +182,15 @@ public class IngameState extends GwarState {
 
 		ConfigurableEmitter.setRelativePath("data");
 
+	}
+	
+	public void toggleSound() {
+	  soundEnabled = !soundEnabled;
+	  if (soundEnabled){
+	    music.loop();
+	  } else {
+	    music.stop();
+	  }
 	}
 
 	//when key pressed
@@ -208,6 +245,10 @@ public class IngameState extends GwarState {
 		{
 			level.pship.wantDirectionDOWN(false);
 		}
+		if(key == Input.KEY_M)
+    {
+      toggleSound();
+    }
 		if (key == Input.KEY_ESCAPE)
 		{
 			System.exit(0);

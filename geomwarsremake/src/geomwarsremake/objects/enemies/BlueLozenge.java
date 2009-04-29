@@ -63,4 +63,9 @@ public class BlueLozenge extends Enemy {
 		// TODO Auto-generated method stub
 		
 	}
+	
+	 public void hited(){
+	    //set as not active, remove from play field
+	   dead = true;
+	  }
 }

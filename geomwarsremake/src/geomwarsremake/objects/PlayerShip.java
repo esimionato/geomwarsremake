@@ -10,8 +10,17 @@ public class PlayerShip extends GwrObject{
 	private int weaponInterval = 200;// 200 = one second
 	int delayBeforeNextShot = 0;
 	private int bombs = 3;
+	private int scores = 0;
 	
-	//Ship speed
+	public int getScores() {
+    return scores;
+  }
+
+  public void addScores(int add) {
+    this.scores += add;
+  }
+
+  //Ship speed
 	private float speedX = 0;
 	private float speedY = 0;
 

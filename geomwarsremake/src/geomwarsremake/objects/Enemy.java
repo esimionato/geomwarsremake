@@ -4,11 +4,11 @@ public abstract class Enemy extends GwrObject{
   private float weight = 1;
   
   //set active when we add object to map (e.g. we could create it and set coordinates beforehand)
-  private boolean active = false;
+  protected boolean active = false;
   // indicate that object is dead and will be removed soon
-  private boolean dead = false;
+  protected boolean dead = false;
   //enemy type (snake, hole, pacman, etc)
-  private String type = "";
+  protected String type = "";
 
 	@Override
 	public abstract void updatePosition(int deltaTime, Level level);
@@ -30,11 +30,16 @@ public abstract class Enemy extends GwrObject{
 	 * maybe we should give coordinate of hit, so object will recognize where it was hitted
 	 */
 	public void hited(){
-	  
+	  //set as not active, remove from play field
 	}
 	
 	// when enemy is died (display animation, remove object)
 	public void died() {
+	  
+	}
+	
+	public boolean isDead() {
+	  return dead;
 	  
 	}
 

@@ -9,6 +9,8 @@ public class Shot extends GwrObject{
 	//Shot speed
 	float speedX;
 	float speedY;
+	public float timeRemain = 5; //shot stay 5 seconds, and then  removed
+	private boolean destroyed = false;
 	
 	/**
 	 * Create a shot. The shot speed is affected by the ship movement
@@ -79,6 +81,24 @@ public class Shot extends GwrObject{
 				//We have a collision. Do something
 			}
 		}
+	}
+	
+	public void setDestroyed() {
+	  destroyed = true;
+	}
+	
+	 public boolean getDestroyed() {
+	    return destroyed;
+	  }
+	
+	/**
+	 * Reduces ttl and return remain time.
+	 * @param t - ammount to which is reduced
+	 * @return
+	 */
+	public float reduceLiveTime(float t) {
+	  timeRemain -= t;
+	  return timeRemain;
 	}
 
 }
