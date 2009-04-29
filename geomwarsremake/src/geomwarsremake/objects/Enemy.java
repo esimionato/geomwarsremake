@@ -1,6 +1,6 @@
 package geomwarsremake.objects;
 
-public class Enemy extends GwrObject{
+public abstract class Enemy extends GwrObject{
   private float weight = 1;
   
   //set active when we add object to map (e.g. we could create it and set coordinates beforehand)
@@ -11,10 +11,10 @@ public class Enemy extends GwrObject{
   private String type = "";
 
 	@Override
-	public void updatePosition(int deltaTime) {
-		// TODO Auto-generated method stub
-		
-	}
+	public abstract void updatePosition(int deltaTime, Level level);
+	
+	@Override
+	public abstract void checkForCollision(Level level);
 	
 
 	/**
@@ -22,7 +22,7 @@ public class Enemy extends GwrObject{
 	 * @param level - ingame level
 	 */
 	public void actAI(Level level){
-	  
+	  //I will put it in updatePosition
 	}
   
 	/**
@@ -37,6 +37,5 @@ public class Enemy extends GwrObject{
 	public void died() {
 	  
 	}
-	
 
 }

@@ -12,6 +12,8 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.particles.ConfigurableEmitter;
 import org.newdawn.slick.state.StateBasedGame;
 
+import util.GeomWarUtil;
+
 
 public class IngameState extends GwarState {
 	static Logger logger = Logger.getLogger(IngameState.class);
@@ -34,6 +36,14 @@ public class IngameState extends GwarState {
 	public int getID() {
 		return id;
 	}
+	
+	@Override
+	public void initState(GameContainer c) throws SlickException {
+		setBackground(new Color(87, 146, 186));  
+		c.setMaximumLogicUpdateInterval(50);
+		width = c.getWidth();
+		height = c.getHeight();
+	}
 
 	@Override
 	public void renderState(GameContainer c, Graphics g) {
@@ -53,11 +63,16 @@ public class IngameState extends GwarState {
 		
 
 		//draw enemies
+		//Temporary
+		g.setColor(Color.magenta);
+		for(Enemy enemy : level.enemies){
+			g.draw(enemy.getCircle());
+		}
 
 		//draw shots
 		g.setColor(Color.blue);
 		for(Shot shot : level.shots){
-			g.fill(shot.getCircle());
+			g.draw(shot.getCircle());
 		}
 
 		//draw player
@@ -86,24 +101,18 @@ public class IngameState extends GwarState {
 		g.setColor(Color.black);
 	}
 
-	/*//Still useful? Why we have mouseX and mouseY.
-	public void mouseMoved(int oldx, int oldy, int newx, int newy) {
-		mouseX = newx-level.pship.getCircle().getCenterX();
-		mouseY = newy-level.pship.getCircle().getCenterY();
-	}*/
-
 	public void updateState(GameContainer container, int delta){
 		Input input = container.getInput();
 		//check mouse controls
 		
 
 		//move player
-		level.pship.updatePosition(delta);
+		level.pship.updatePosition(delta, level);
 		
 		//Update player direction
 		float x = input.getMouseX() - width/2;
 		float y = input.getMouseY() - height/2;
-		level.pship.setFaceAllignment((float)findAngle(x, y));
+		level.pship.setFaceAllignment((float)GeomWarUtil.findAngle(x, y));
 		
 		//Create shots
 		if(level.shots.size() > 20){ 
@@ -117,14 +126,17 @@ public class IngameState extends GwarState {
 		}
 		
 		if(input.isMouseButtonDown(Input.MOUSE_RIGHT_BUTTON)){
-      level.pship.wantUseBomb();
-    }
+			level.pship.wantUseBomb();
+		}
 		
 		//move enemies
+		for(Enemy enemy : level.enemies){
+			enemy.updatePosition(delta, level);
+		}
 
 		//move shots
 		for(Shot shot : level.shots){
-			shot.updatePosition(delta);
+			shot.updatePosition(delta, level);
 		}
 
 		//calculate hits
@@ -145,6 +157,7 @@ public class IngameState extends GwarState {
 	}
 
 	//when key pressed
+	@Override
 	public void keyPressed(int key, char c)
 	{
 		super.keyPressed(key, c);
@@ -175,6 +188,7 @@ public class IngameState extends GwarState {
 	}
 
 	//when key released
+	@Override
 	public void keyReleased(int key, char c)
 	{
 		super.keyReleased(key, c);
@@ -199,42 +213,15 @@ public class IngameState extends GwarState {
 			System.exit(0);
 		}   
 	}
-
+	
+	/*//Still useful? Why we have mouseX and mouseY.
 	@Override
-	public void initState(GameContainer c) throws SlickException {
-		setBackground(new Color(87, 146, 186));  
-		c.setMaximumLogicUpdateInterval(50);
-		width = c.getWidth();
-		height = c.getHeight();
-	}
+	public void mouseMoved(int oldx, int oldy, int newx, int newy) {
+		mouseX = newx-level.pship.getCircle().getCenterX();
+		mouseY = newy-level.pship.getCircle().getCenterY();
+	}*/
 
-	/**
-	 * The angle of the vector (x, y). The angle is between 0 and 2*PI.
-	 * @param x The x value of the vector.
-	 * @param y The y value of the vector.
-	 * @return The angle of the vector (x, y).
-	 */
-	private double findAngle(double x, double y){
-		double theta = 0;
-		if(x == 0){
-			if(y>0){
-				theta = Math.PI/2;
-			}else if(y < 0){
-				theta = Math.PI*3/2;
-			}
-		}
-		if(x > 0){
-			theta = Math.atan(y/Math.abs(x));
-		}
-		if(x < 0){
-			theta = Math.PI - Math.atan(y/Math.abs(x));
-		}
-
-		if(theta < 0){
-			theta += Math.PI*2;
-		}
-		return theta;
-	}
+	
 	
 	/**
 	 * The translation that we operate on the graphics object on the x axis

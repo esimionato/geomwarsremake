@@ -4,7 +4,7 @@ import org.newdawn.slick.geom.Circle;
 
 public abstract class GwrObject {
   //Object position
-  private Circle circle;
+  protected Circle circle;
   //specify where object is faced (angle)
   private float faceAllignment = 0;
   //basic speed
@@ -14,7 +14,9 @@ public abstract class GwrObject {
   protected int directionY = 0;
   
   
-  public abstract void updatePosition(int deltaTime);
+  public abstract void updatePosition(int deltaTime, Level level);
+  
+  public abstract void checkForCollision(Level level);
 
   public int getDirectionX() {
     return directionX;
