@@ -1,7 +1,6 @@
 package geomwarsremake.objects;
 
 public abstract class Enemy extends GwrObject{
-  private float weight = 1;
   
   //set active when we add object to map (e.g. we could create it and set coordinates beforehand)
   protected boolean active = false;
@@ -16,9 +15,30 @@ public abstract class Enemy extends GwrObject{
 	@Override
 	public abstract void checkForCollision(Level level);
 	
+	/**
+     * Move this object outside of the object it just collide with.
+     * 
+     * @param distX The distance in x between this object and the one it collide with.
+     * @param distY The distance in y between this object and the one it collide with.
+     * @param distance The distance between this object and the one it collide with.
+     * @param desiredDistance The distance this object is suppose to be from the object 
+     * it collide with.
+     */
+    protected void collisionUpdate(float distX, float distY, float distance, float desiredDistance){
+        float x = circle.getX();
+        float y = circle.getY();
+        if(distance != 0){
+            x += (distX/distance) * (desiredDistance-distance + 1);
+            y += (distY/distance) * (desiredDistance-distance + 1);
+        }else{
+            x += desiredDistance + 1;
+        }
+        circle.setLocation(x, y);
+    }
+	
 
 	/**
-	 * AI logic here, should be iimplemented for each spesific enemy type separately.
+	 * AI logic here, should be implemented for each specific enemy type separately.
 	 * @param level - ingame level
 	 */
 	public void actAI(Level level){

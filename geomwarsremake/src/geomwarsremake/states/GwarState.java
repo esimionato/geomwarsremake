@@ -61,7 +61,7 @@ public abstract class GwarState extends BasicGameState implements MouseListener{
   }
   
   public void keyPressed(int key, char c) {
-    getContext().globalKeyPressed(key, c);
+	  getContext().globalKeyPressed(key, c);
   }
   
   

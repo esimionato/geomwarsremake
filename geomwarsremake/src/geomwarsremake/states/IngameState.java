@@ -139,7 +139,7 @@ public class IngameState extends GwarState {
 		//move enemies
 		for(Enemy enemy : level.enemies){
 			enemy.updatePosition(delta, level);
-			
+			enemy.checkForCollision(level);
 		}
 
 		//move shots

@@ -1,5 +1,7 @@
 package geomwarsremake.objects;
 
+import geomwarsremake.objects.enemies.AttractionHole;
+
 import java.util.ArrayList;
 
 import org.newdawn.slick.geom.Circle;
@@ -55,6 +57,24 @@ public class PlayerShip extends GwrObject{
 			speedX *= 0.707; //Math.sqrt(0.5)
 			speedY *= 0.707; //Math.sqrt(0.5)
 		}
+		//For every AttractionHole
+		for(AttractionHole hole : level.holes){
+			float shipX = circle.getCenterX();
+			float shipY = circle.getCenterY();
+			float holeX = hole.getCircle().getCenterX();
+			float holeY = hole.getCircle().getCenterY();
+			float deltaX = holeX - shipX;
+			float deltaY = holeY - shipY;
+			float distance = (float) Math.sqrt(deltaX*deltaX + deltaY*deltaY);
+			if(distance < hole.getAttractionRadius()){
+				//BlueLozenge is attract by the AttractionHole
+				float ax = hole.getAttractionForce(distance)/weight * (deltaX/distance);
+				float ay = hole.getAttractionForce(distance)/weight * (deltaY/distance);
+				speedX += ax * deltaTime/1000;
+				speedY += ay * deltaTime/1000;
+			}
+		}
+		
 		//Get the position difference we need to move the ship this turn;
 		float deltaX = speedX*deltaTime;
 		float deltaY = speedY*deltaTime;

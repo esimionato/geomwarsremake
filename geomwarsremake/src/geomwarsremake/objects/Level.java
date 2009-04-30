@@ -19,6 +19,9 @@ public class Level {
   public void load() {
     pship = new PlayerShip();
     enemies.add(new BlueLozenge(400,0));
+    AttractionHole hole = new AttractionHole(100, 300);
+    enemies.add(hole);
+    holes.add(hole);
   }
   
   

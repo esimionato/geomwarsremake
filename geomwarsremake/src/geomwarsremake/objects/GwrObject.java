@@ -12,6 +12,10 @@ public abstract class GwrObject {
   //movement
   protected int directionX = 0;
   protected int directionY = 0;
+  /** The weight of this object */
+  protected float weight = 1;
+  protected float speedX = 0;
+  protected float speedY = 0;
   
   
   public abstract void updatePosition(int deltaTime, Level level);
