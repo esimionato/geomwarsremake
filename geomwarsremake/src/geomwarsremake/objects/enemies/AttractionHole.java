@@ -21,6 +21,11 @@ public class AttractionHole extends Enemy {
 	public AttractionHole(int posX, int posY){
 		setCircle(new Circle(posX, posY, 20));
 		setSpeed(0.01f);
+		score = 50;
+	}
+	
+	public boolean isInstanceOf(Enemy enemy){
+		return enemy instanceof AttractionHole;
 	}
 	
 	public float getAttractionRadius(){
@@ -30,6 +35,19 @@ public class AttractionHole extends Enemy {
 	public float getAttractionForce(float distance){
 		//This formula is subject to change
 		return (float) (attractionForce * Math.pow((attractionRadius - distance)/attractionRadius, 2));
+	}
+	
+	public void absorbEnemy(Enemy enemy){
+		score += enemy.getScore();
+	}
+	
+	@Override
+	public void hited(Level level){
+		if(!isAttracting){
+			isAttracting = true;
+		}else{
+			super.hited(level);
+		}
 	}
 
 	@Override
@@ -56,11 +74,6 @@ public class AttractionHole extends Enemy {
 		float newX = circle.getX() + deltaX;
 		float newY = circle.getY() + deltaY;
 		getCircle().setLocation(newX, newY);
-	}
-	
-	@Override
-	public void checkForCollision(Level level) {
-		
 	}
 
 }

@@ -63,7 +63,7 @@ public class IngameState extends GwarState {
 		
 		//Draw map area
 		g.setColor(Color.white);
-		g.drawRect(0, 0, 800, 600);
+		g.drawRect(0, 0, level.mapWidth, level.mapHeight);
 		
 
 		//draw enemies
@@ -77,7 +77,7 @@ public class IngameState extends GwarState {
 		g.setColor(Color.blue);
 		for(Shot shot : level.shots){
 			g.draw(shot.getCircle());
-			g.drawString(""+shot.timeRemain, shot.getCircle().getMinX(), shot.getCircle().getMinY());
+			//g.drawString(""+shot.timeRemain, shot.getCircle().getMaxX(), shot.getCircle().getMinY());
 		}
 
 		//draw player
@@ -96,11 +96,14 @@ public class IngameState extends GwarState {
 
 		//draw effects
 
-		//draw GUI
 		//set translation back
 		g.translate(-getTranslateX(), -getTranslateY());
+		
+		//draw GUI
 		g.setColor(Color.green);
 		g.drawString("face "+level.pship.getFaceAllignment(), 20, 20);
+		g.drawString("life "+level.pship.getNumberOfLife(), 200, 20);
+		g.drawString("bomb "+level.pship.getNumberOfBomb(), 300, 20);
 		g.drawString("Score: "+level.pship.getScores(), 900, 700);
 		//g.drawString("mouseX "+mouseX, 300, 20);
 		//g.drawString("mouseY "+mouseY, 300, 40);
@@ -108,22 +111,30 @@ public class IngameState extends GwarState {
 	}
 
 	public void updateState(GameContainer container, int delta){
+		//Check to see if the ship is alive
+		if(!level.pship.isAlive()){
+			level.resetEnemies(); //The enemies list will only have elements to clear 1 time
+			level.pship.updateRespawnTime(delta);
+			return;
+		}
+		//Remove dead objects
+		level.removeDeadObjects();
+		
 		Input input = container.getInput();
 		//check mouse controls
+		
+		//Update ship direction movement
+		level.pship.setDirection(input);
 		
 
 		//move player
 		level.pship.updatePosition(delta, level);
+		level.pship.collisionMapArea(level);
 		
 		//Update player direction
 		float x = input.getMouseX() - width/2;
 		float y = input.getMouseY() - height/2;
 		level.pship.setFaceAllignment((float)GeomWarUtil.findAngle(x, y));
-		
-		/*//Create shots
-		if(level.shots.size() > 20){ 
-			level.shots.clear(); //Too much lag currently. The shots never disappear.
-		}*/
 		
 		level.pship.updateShotTime(delta);
 		if(input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)){
@@ -139,23 +150,25 @@ public class IngameState extends GwarState {
 		//move enemies
 		for(Enemy enemy : level.enemies){
 			enemy.updatePosition(delta, level);
+			enemy.collisionMapArea(level);
 			enemy.checkForCollision(level);
 		}
 
 		//move shots
 		for(Shot shot : level.shots){
 			shot.updatePosition(delta, level);
-			if(shot.reduceLiveTime(0.02f)<0){
-			  shot.setDestroyed();
+			shot.collisionMapArea(level);
+			if(shot.reduceLiveTime((float) (delta/1000.0))<0){ //replace 0.02f
+				shot.setDestroyed();
 			}
 		}
 		
 		//remove destroyed shots
 		for (int i = 0; i<level.shots.size();i++){
-		  if (level.shots.get(i).getDestroyed()){
-		    level.shots.remove(i);
-		    i--;
-		  }
+			if (level.shots.get(i).getDestroyed()){
+				level.shots.remove(i);
+				i--;
+			}
 		}
 
 		//calculate hits
@@ -201,8 +214,9 @@ public class IngameState extends GwarState {
 		if (key == Input.KEY_R)
 		{
 			level = new Level();
+			level.load();
 		}
-		if(key == Input.KEY_W)
+		/*if(key == Input.KEY_W)
 		{
 			level.pship.wantDirectionUP(true);
 		}
@@ -217,7 +231,7 @@ public class IngameState extends GwarState {
 		if(key == Input.KEY_S)
 		{
 			level.pship.wantDirectionDOWN(true);
-		}
+		}*/
 		if (key == Input.KEY_ESCAPE)
 		{
 			System.exit(0);
@@ -229,7 +243,7 @@ public class IngameState extends GwarState {
 	public void keyReleased(int key, char c)
 	{
 		super.keyReleased(key, c);
-		if(key == Input.KEY_W)
+		/*if(key == Input.KEY_W)
 		{
 			level.pship.wantDirectionUP(false);
 		}
@@ -244,11 +258,11 @@ public class IngameState extends GwarState {
 		if(key == Input.KEY_S)
 		{
 			level.pship.wantDirectionDOWN(false);
-		}
+		}*/
 		if(key == Input.KEY_M)
-    {
-      toggleSound();
-    }
+		{
+			toggleSound();
+		}
 		if (key == Input.KEY_ESCAPE)
 		{
 			System.exit(0);
@@ -269,11 +283,13 @@ public class IngameState extends GwarState {
 	 * @return The x value of the translation
 	 */
 	private float getTranslateX(){
-		return -level.pship.getCircle().getCenterX() + width/2;
+		float shipX = level.pship.getCircle().getCenterX();
+		return -shipX + width/2;
 	}
 
 	private float getTranslateY(){
-		return -level.pship.getCircle().getCenterY() + height/2;
+		float shipY = level.pship.getCircle().getCenterY();
+		return -shipY + height/2;
 	}
 
 }

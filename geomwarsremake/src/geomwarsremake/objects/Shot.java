@@ -1,10 +1,12 @@
 package geomwarsremake.objects;
 
+import geomwarsremake.objects.enemies.AttractionHole;
+
 import org.newdawn.slick.geom.Circle;
 
 public class Shot extends GwrObject{
 	
-	private static final float SHOT_SPEED = 0.5f;
+	private static final float SHOT_SPEED = 0.6f;
 	
 	//Shot speed
 	float speedX;
@@ -26,23 +28,48 @@ public class Shot extends GwrObject{
 		//Get the speed of the ship
 		float shipSpeedX = ship.getSpeedX();
 		float shipSpeedY = ship.getSpeedY();
-		//setSpeed(1f);
 		//Get the direction the shot was fired
 		float directionAngle = ship.getFaceAllignment();
 		//Calculate the speed of the shot
 		speedX = (float) (SHOT_SPEED*Math.cos(directionAngle) + shipSpeedX);
 		speedY = (float) (SHOT_SPEED*Math.sin(directionAngle) + shipSpeedY);
+		setSpeed((float) Math.sqrt(speedX*speedX + speedY*speedY));
+		//Set weight
+		weight = 10;
 	}
 
 	@Override
 	/**
 	 * Update the position of the shot
-	 * - Check for attraction from attraction circle (TODO)
+	 * - Check for repulsion from attraction circle
 	 * - Change the position of the shot
 	 * @param deltaTime The time delay since the last update.
 	 * @param level The level containing all the objects in this game.
 	 */
 	public void updatePosition(int deltaTime, Level level) {
+		//For every AttractionHole
+		for(AttractionHole hole : level.holes){
+			if(hole.isAttracting){
+				float shipX = circle.getCenterX();
+				float shipY = circle.getCenterY();
+				float holeX = hole.getCircle().getCenterX();
+				float holeY = hole.getCircle().getCenterY();
+				float delta2X = holeX - shipX;
+				float delta2Y = holeY - shipY;
+				float distance = (float) Math.sqrt(delta2X*delta2X + delta2Y*delta2Y);
+				if(distance < hole.getAttractionRadius()){
+					//Shot is repulse by the AttractionHole
+					float ax = -hole.getAttractionForce(distance)/weight * (delta2X/distance);
+					float ay = -hole.getAttractionForce(distance)/weight * (delta2Y/distance);
+					speedX += ax * deltaTime/1000;
+					speedY += ay * deltaTime/1000;
+				}
+			}
+		}
+		//Adjust speed (The speed must remain constant)
+		float speedTotal = (float) Math.sqrt(speedX*speedX + speedY*speedY);
+		speedX = speedX/speedTotal*getSpeed();
+		speedY = speedY/speedTotal*getSpeed();
 		//Calculate the distance we will move the shot.
 		float deltaX = speedX*deltaTime;
 		float deltaY = speedY*deltaTime;

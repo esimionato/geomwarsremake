@@ -4,25 +4,27 @@ import geomwarsremake.objects.enemies.AttractionHole;
 
 import java.util.ArrayList;
 
+import org.newdawn.slick.Input;
 import org.newdawn.slick.geom.Circle;
 
 public class PlayerShip extends GwrObject{
 
-	//temp weapon
-	private int weaponInterval = 200;// 200 = one second
-	int delayBeforeNextShot = 0;
+	private final int WEAPON_INTERVAL = 200;// 200 = one shot
+	private final int TIME_BETWEEN_RESPAWN = 1000;
+	private final int WEAPON1 = 1;
+	private final int WEAPON2 = 2;
+	private final int WEAPON3 = 3;
+	
+	private int delayBeforeNextShot = 0;
+	private int delayBeforeRespawn = 0;
+	
 	private int bombs = 3;
+	private int lifes = 3;
 	private int scores = 0;
 	
-	public int getScores() {
-    return scores;
-  }
-
-  public void addScores(int add) {
-    this.scores += add;
-  }
-
-  //Ship speed
+	private int currentWeapon = 1;
+	
+	//Ship speed
 	private float speedX = 0;
 	private float speedY = 0;
 
@@ -30,20 +32,60 @@ public class PlayerShip extends GwrObject{
 		setCircle(new Circle(400, 400, 10));
 		setSpeed(0.3f);
 	}
-	
+
+	public int getScores() {
+		return scores;
+	}
+
+	public void addScores(int add) {
+		this.scores += add;
+	}
+
 	public float getSpeedX(){
 		return speedX;
 	}
-	
+
 	public float getSpeedY(){
 		return speedY;
+	}
+	
+	public int getDirectionX() {
+		return directionX;
+	}
+	
+	public int getDirectionY() {
+		return directionY;
+	}
+	
+	public int getNumberOfLife(){
+		return lifes;
+	}
+	
+	public int getNumberOfBomb(){
+		return bombs;
+	}
+	
+	public void died(){
+		delayBeforeRespawn = TIME_BETWEEN_RESPAWN;
+		lifes--;
+	}
+	
+	public boolean isAlive(){
+		return delayBeforeRespawn == 0;
+	}
+	
+	public void updateRespawnTime(int deltaTime){
+		delayBeforeRespawn -= deltaTime;
+		if(delayBeforeRespawn < 0){
+			delayBeforeRespawn = 0;
+		}
 	}
 	
 	@Override
 	/**
 	 * Update the position of the ship
 	 * - Check for player input
-	 * - Check for attraction from attraction circle (TODO)
+	 * - Check for attraction from attraction circle
 	 * - Change the position of the ship
 	 * @param deltaTime The time delay since the last update.
 	 * @param level The level containing all the objects in this game.
@@ -59,19 +101,21 @@ public class PlayerShip extends GwrObject{
 		}
 		//For every AttractionHole
 		for(AttractionHole hole : level.holes){
-			float shipX = circle.getCenterX();
-			float shipY = circle.getCenterY();
-			float holeX = hole.getCircle().getCenterX();
-			float holeY = hole.getCircle().getCenterY();
-			float deltaX = holeX - shipX;
-			float deltaY = holeY - shipY;
-			float distance = (float) Math.sqrt(deltaX*deltaX + deltaY*deltaY);
-			if(distance < hole.getAttractionRadius()){
-				//BlueLozenge is attract by the AttractionHole
-				float ax = hole.getAttractionForce(distance)/weight * (deltaX/distance);
-				float ay = hole.getAttractionForce(distance)/weight * (deltaY/distance);
-				speedX += ax * deltaTime/1000;
-				speedY += ay * deltaTime/1000;
+			if(hole.isAttracting){
+				float shipX = circle.getCenterX();
+				float shipY = circle.getCenterY();
+				float holeX = hole.getCircle().getCenterX();
+				float holeY = hole.getCircle().getCenterY();
+				float deltaX = holeX - shipX;
+				float deltaY = holeY - shipY;
+				float distance = (float) Math.sqrt(deltaX*deltaX + deltaY*deltaY);
+				if(distance < hole.getAttractionRadius()){
+					//Ship is attract by the AttractionHole
+					float ax = hole.getAttractionForce(distance)/weight * (deltaX/distance);
+					float ay = hole.getAttractionForce(distance)/weight * (deltaY/distance);
+					speedX += ax * deltaTime/1000;
+					speedY += ay * deltaTime/1000;
+				}
 			}
 		}
 		
@@ -109,7 +153,7 @@ public class PlayerShip extends GwrObject{
 			
 			//Check if we have a collision
 			if(distance < totalRadius){
-				//We have a collision. Do something
+				died();
 			}
 		}
 	}
@@ -125,13 +169,32 @@ public class PlayerShip extends GwrObject{
 	public ArrayList<Shot> createShot(){
 		ArrayList<Shot> list = new ArrayList<Shot>();
 		if(delayBeforeNextShot == 0){
-			list.add(new Shot(this));
-			delayBeforeNextShot = weaponInterval;
+			if(currentWeapon == WEAPON1){
+				list.add(new Shot(this));
+				delayBeforeNextShot = WEAPON_INTERVAL;
+			}
 		}
 		return list;
 	}
 	
-	public void wantDirectionDOWN(boolean wantDown) {
+	public void setDirection(Input input){
+		directionX = 0;
+		directionY = 0;
+		if(input.isKeyDown(Input.KEY_W)){
+			directionY--;
+		}
+		if(input.isKeyDown(Input.KEY_S)){
+			directionY++;
+		}
+		if(input.isKeyDown(Input.KEY_A)){
+			directionX--;
+		}
+		if(input.isKeyDown(Input.KEY_D)){
+			directionX++;
+		}
+	}
+	
+	/*public void wantDirectionDOWN(boolean wantDown) {
 		if(wantDown) {
 			directionY++;
 		} else {
@@ -161,12 +224,12 @@ public class PlayerShip extends GwrObject{
 		} else {
 			directionX++;
 		} 
-	}
+	}*/
 	
 	public void wantUseBomb() {
-	  if (bombs > 1) {
-	    //activate it
-	  }
+		if (bombs > 1) {
+			//activate it
+		}
 	}
 
 }

@@ -5,10 +5,9 @@ import geomwarsremake.objects.Level;
 
 public class Spinning extends Enemy {
 
-	@Override
-	public void checkForCollision(Level level) {
-		// TODO Auto-generated method stub
-		
+	
+	public boolean isInstanceOf(Enemy enemy){
+		return enemy instanceof Spinning;
 	}
 
 	@Override

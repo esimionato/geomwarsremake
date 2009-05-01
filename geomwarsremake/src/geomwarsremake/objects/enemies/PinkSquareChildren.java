@@ -5,10 +5,9 @@ import geomwarsremake.objects.Level;
 
 public class PinkSquareChildren extends Enemy {
 
-	@Override
-	public void checkForCollision(Level level) {
-		// TODO Auto-generated method stub
-		
+	
+	public boolean isInstanceOf(Enemy enemy){
+		return enemy instanceof PinkSquareChildren;
 	}
 
 	@Override
