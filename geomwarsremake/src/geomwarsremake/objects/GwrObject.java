@@ -24,6 +24,10 @@ public abstract class GwrObject {
 
 	public abstract void checkForCollision(Level level);
 
+	/** 
+	 * Keep all object inside the map area 
+	 * @param level The level containing all the objects of this game
+	 */
 	public void collisionMapArea(Level level){
 		float x = circle.getX();
 		float y = circle.getY();
@@ -31,24 +35,36 @@ public abstract class GwrObject {
 		if(circle.getMinX() < 0){
 			x = 0;
 			speedX = -speedX;
+			hitMapArea(level);
 		}
 		//North
 		if(circle.getMinY() < 0){
 			y = 0;
 			speedY = -speedY;
+			hitMapArea(level);
 		}
 		//East
 		if(circle.getMaxX() > level.mapWidth){
 			x = level.mapWidth - circle.getRadius()*2;
 			speedX = -speedX;
+			hitMapArea(level);
 		}
 		//South
 		if(circle.getMaxY() > level.mapHeight){
 			y = level.mapHeight - circle.getRadius()*2;
 			speedY = -speedY;
+			hitMapArea(level);
 		}
 		//Move the circle
 		circle.setLocation(x, y);
+	}
+	
+	/**
+	 * The action that is performed when an object hit the map area. For the ship and
+	 * enemies it does nothing but shot are destroy.
+	 */
+	public void hitMapArea(Level level){
+		//Only implement in shot
 	}
 
 	public Circle getCircle(){

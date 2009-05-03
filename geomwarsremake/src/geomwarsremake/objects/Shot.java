@@ -6,33 +6,35 @@ import org.newdawn.slick.geom.Circle;
 
 public class Shot extends GwrObject{
 	
-	private static final float SHOT_SPEED = 0.6f;
+	public static final float SHOT_SPEED = 0.6f;
 	
 	//Shot speed
 	float speedX;
 	float speedY;
-	public float timeRemain = 5; //shot stay 5 seconds, and then  removed
-	private boolean destroyed = false;
+	/** Indicate if the shot can hit enemies */
+	private boolean canHit = true;
+	
+	/**
+	 * @return If the shot can hit an enemy or not
+	 */
+	public boolean getCanHit(){
+		return canHit;
+	}
 	
 	/**
 	 * Create a shot. The shot speed is affected by the ship movement
 	 * @param ship The ship that fired the shot.
 	 */
-	public Shot(PlayerShip ship){
-		//Get the position of the ship
-		float shipX = ship.getCircle().getCenterX();
-		float shipY = ship.getCircle().getCenterY();
+	public Shot(PlayerShip ship, float posX, float posY, float directionAngle, float speed){
 		//Set the position of the shot
-		setCircle(new Circle(shipX, shipY, 5));
+		setCircle(new Circle(posX, posY, 5));
 		
 		//Get the speed of the ship
 		float shipSpeedX = ship.getSpeedX();
 		float shipSpeedY = ship.getSpeedY();
-		//Get the direction the shot was fired
-		float directionAngle = ship.getFaceAllignment();
 		//Calculate the speed of the shot
-		speedX = (float) (SHOT_SPEED*Math.cos(directionAngle) + shipSpeedX);
-		speedY = (float) (SHOT_SPEED*Math.sin(directionAngle) + shipSpeedY);
+		speedX = (float) (speed*Math.cos(directionAngle) + shipSpeedX);
+		speedY = (float) (speed*Math.sin(directionAngle) + shipSpeedY);
 		setSpeed((float) Math.sqrt(speedX*speedX + speedY*speedY));
 		//Set weight
 		weight = 10;
@@ -89,43 +91,46 @@ public class Shot extends GwrObject{
 	public void checkForCollision(Level level) {
 		//For every enemy
 		for(Enemy enemy : level.enemies){
-			//Get the position of the shot
-			float shipX = circle.getCenterX();
-			float shipY = circle.getCenterY();
-			//Get the position of the enemy
-			float enemyX = enemy.circle.getCenterX();
-			float enemyY = enemy.circle.getCenterY();
-			//Get the total radius of the shot's circle + enemy's circle
-			float totalRadius = circle.getRadius() + enemy.circle.getRadius();
-			
-			//Calculate the distance between the shot and the enemy
-			float deltaX = shipX - enemyX;
-			float deltaY = shipY - enemyY;
-			float distance = (float) Math.sqrt(deltaX*deltaX + deltaY*deltaY);
-			
-			//Check if we have a collision
-			if(distance < totalRadius){
-				//We have a collision. Do something
+			if(!enemy.isDead()){
+				//Get the position of the shot
+				float shipX = circle.getCenterX();
+				float shipY = circle.getCenterY();
+				//Get the position of the enemy
+				float enemyX = enemy.circle.getCenterX();
+				float enemyY = enemy.circle.getCenterY();
+				//Get the total radius of the shot's circle + enemy's circle
+				float totalRadius = circle.getRadius() + enemy.circle.getRadius();
+
+				//Calculate the distance between the shot and the enemy
+				float deltaX = shipX - enemyX;
+				float deltaY = shipY - enemyY;
+				float distance = (float) Math.sqrt(deltaX*deltaX + deltaY*deltaY);
+
+				//Check if we have a collision
+				if(distance < totalRadius){
+					hited(level);
+					enemy.hited(level);
+					break;
+				}
 			}
 		}
 	}
 	
-	public void setDestroyed() {
-	  destroyed = true;
+	/**
+	 * Called when a shot hit an enemy
+	 * @param level
+	 */
+	public void hited(Level level){
+		canHit = false;
 	}
 	
-	 public boolean getDestroyed() {
-	    return destroyed;
-	  }
-	
 	/**
-	 * Reduces ttl and return remain time.
-	 * @param t - ammount to which is reduced
-	 * @return
+	 * Called when a shot hit the map area
+	 * @param level The level containing all the object in this game
 	 */
-	public float reduceLiveTime(float t) {
-	  timeRemain -= t;
-	  return timeRemain;
+	public void hitMapArea(Level level){
+		canHit = false;
+		//Add animation when the shot hit the wall
 	}
 
 }

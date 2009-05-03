@@ -19,8 +19,6 @@ import util.GeomWarUtil;
 public class IngameState extends GwarState {
 	static Logger logger = Logger.getLogger(IngameState.class);
 	private Level level;
-	public static final int id = 3;
-	//float mouseX,mouseY;
 	/** GameContainer width */
 	float width;
 	/** GameContainer height */
@@ -28,16 +26,12 @@ public class IngameState extends GwarState {
 	private boolean soundEnabled = false;
 	private Music music;
 
-	public IngameState(GeomWarsRemake ctx) {
-		super(ctx);
+	public IngameState(GeomWarsRemake ctx, int stateID) {
+		super(ctx, stateID);
 	}
 
 	public void enter(GameContainer container, StateBasedGame game) throws SlickException {
 		super.enter(container, game);
-	}
-
-	public int getID() {
-		return id;
 	}
 	
 	@Override
@@ -113,12 +107,14 @@ public class IngameState extends GwarState {
 	public void updateState(GameContainer container, int delta){
 		//Check to see if the ship is alive
 		if(!level.pship.isAlive()){
-			level.resetEnemies(); //The enemies list will only have elements to clear 1 time
-			level.pship.updateRespawnTime(delta);
-			return;
+			if(level.pship.getCanRevive()){
+				level.resetEnemies(); //The enemies list will only have elements to clear 1 time
+				level.pship.updateRespawnTime(delta);
+				return;
+			}else{
+				//GameOver
+			}
 		}
-		//Remove dead objects
-		level.removeDeadObjects();
 		
 		Input input = container.getInput();
 		//check mouse controls
@@ -131,11 +127,12 @@ public class IngameState extends GwarState {
 		level.pship.updatePosition(delta, level);
 		level.pship.collisionMapArea(level);
 		
-		//Update player direction
+		//Update shooting direction
 		float x = input.getMouseX() - width/2;
 		float y = input.getMouseY() - height/2;
 		level.pship.setFaceAllignment((float)GeomWarUtil.findAngle(x, y));
 		
+		//Create shot
 		level.pship.updateShotTime(delta);
 		if(input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)){
 			for(Shot shot : level.pship.createShot()){
@@ -143,47 +140,28 @@ public class IngameState extends GwarState {
 			}
 		}
 		
+		//Use bomb
 		if(input.isMouseButtonDown(Input.MOUSE_RIGHT_BUTTON)){
 			level.pship.wantUseBomb();
 		}
 		
-		//move enemies
+		//move enemies and check for collision
 		for(Enemy enemy : level.enemies){
 			enemy.updatePosition(delta, level);
 			enemy.collisionMapArea(level);
 			enemy.checkForCollision(level);
 		}
 
-		//move shots
+		//move shots and check for collision
 		for(Shot shot : level.shots){
 			shot.updatePosition(delta, level);
 			shot.collisionMapArea(level);
-			if(shot.reduceLiveTime((float) (delta/1000.0))<0){ //replace 0.02f
-				shot.setDestroyed();
-			}
+			shot.checkForCollision(level);
 		}
 		
-		//remove destroyed shots
-		for (int i = 0; i<level.shots.size();i++){
-			if (level.shots.get(i).getDestroyed()){
-				level.shots.remove(i);
-				i--;
-			}
-		}
-
-		//calculate hits
-
-		//kill enemies
+		//Remove dead objects
+		level.removeDeadObjects();
 		
-		//remove emenies from level
-		for(int i = 0; i<level.enemies.size();i++) {
-		  if (level.enemies.get(i).isDead()) {
-		    level.enemies.remove(i);
-		    i--;
-		  }
-		}
-		
-
 		//other
 
 	}
@@ -216,25 +194,10 @@ public class IngameState extends GwarState {
 			level = new Level();
 			level.load();
 		}
-		/*if(key == Input.KEY_W)
-		{
-			level.pship.wantDirectionUP(true);
-		}
-		if(key == Input.KEY_A)
-		{
-			level.pship.wantDirectionLEFT(true);
-		}
-		if(key == Input.KEY_D)
-		{
-			level.pship.wantDirectionRIGHT(true);
-		}
-		if(key == Input.KEY_S)
-		{
-			level.pship.wantDirectionDOWN(true);
-		}*/
 		if (key == Input.KEY_ESCAPE)
 		{
-			System.exit(0);
+			setStarted(false);
+			getContext().enterState(GeomWarsRemake.MENU_STATE);
 		}
 	}
 
@@ -243,39 +206,11 @@ public class IngameState extends GwarState {
 	public void keyReleased(int key, char c)
 	{
 		super.keyReleased(key, c);
-		/*if(key == Input.KEY_W)
-		{
-			level.pship.wantDirectionUP(false);
-		}
-		if(key == Input.KEY_A)
-		{
-			level.pship.wantDirectionLEFT(false);
-		}
-		if(key == Input.KEY_D)
-		{
-			level.pship.wantDirectionRIGHT(false);
-		}
-		if(key == Input.KEY_S)
-		{
-			level.pship.wantDirectionDOWN(false);
-		}*/
 		if(key == Input.KEY_M)
 		{
 			toggleSound();
 		}
-		if (key == Input.KEY_ESCAPE)
-		{
-			System.exit(0);
-		}   
 	}
-	
-	/*//Still useful? Why we have mouseX and mouseY.
-	@Override
-	public void mouseMoved(int oldx, int oldy, int newx, int newy) {
-		mouseX = newx-level.pship.getCircle().getCenterX();
-		mouseY = newy-level.pship.getCircle().getCenterY();
-	}*/
-
 	
 	
 	/**

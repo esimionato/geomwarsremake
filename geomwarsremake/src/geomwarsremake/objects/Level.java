@@ -21,9 +21,6 @@ public class Level {
 	public int mapWidth = 1000;
 	public int mapHeight = 800;
 	
-	public ArrayList<Enemy> enemiesToRemove = new ArrayList<Enemy>();
-	public ArrayList<Shot> shotsToRemove = new ArrayList<Shot>();
-	
 	public void load() {
 		pship = new PlayerShip();
 		addEnemy(new BlueLozenge(400,0));
@@ -50,28 +47,32 @@ public class Level {
 		holes.clear();
 	}
 	
-	public void addEnemy(Enemy enemy){
+	private void addEnemy(Enemy enemy){
 		if(enemy instanceof AttractionHole){
 			holes.add((AttractionHole) enemy);
 		}
 		enemies.add(enemy);
 	}
 	
-	public void removeEnemy(Enemy enemy){
+	private void removeEnemy(Enemy enemy, int index){
 		if(enemy instanceof AttractionHole){
 			holes.remove(enemy);
 		}
-		enemies.remove(enemy);
+		enemies.remove(index);
 	}
 	
 	public void removeDeadObjects(){
-		int size = enemiesToRemove.size();
-		for(int i=0; i<size; i++){
-			removeEnemy(enemiesToRemove.remove(0));
+		for(int i=0; i<enemies.size(); i++){
+			if(enemies.get(i).isDead()){
+				removeEnemy(enemies.get(i), i);
+				i--;
+			}
 		}
-		size = shotsToRemove.size();
-		for(int i=0; i<size; i++){
-			shots.remove(shotsToRemove.remove(0));
+		for(int i=0; i<shots.size(); i++){
+			if(!shots.get(i).getCanHit()){
+				shots.remove(i);
+				i--;
+			}
 		}
 	}
 

@@ -9,7 +9,9 @@ import org.newdawn.slick.geom.Circle;
 
 public class PlayerShip extends GwrObject{
 
-	private final int WEAPON_INTERVAL = 200;// 200 = one shot
+	private final int WEAPON1_INTERVAL = 200;
+	private final int WEAPON2_INTERVAL = 150;
+	private final int WEAPON3_INTERVAL = 200;
 	private final int TIME_BETWEEN_RESPAWN = 1000;
 	private final int WEAPON1 = 1;
 	private final int WEAPON2 = 2;
@@ -72,6 +74,10 @@ public class PlayerShip extends GwrObject{
 	
 	public boolean isAlive(){
 		return delayBeforeRespawn == 0;
+	}
+	
+	public boolean getCanRevive(){
+		return !(lifes == 0);
 	}
 	
 	public void updateRespawnTime(int deltaTime){
@@ -170,13 +176,78 @@ public class PlayerShip extends GwrObject{
 		ArrayList<Shot> list = new ArrayList<Shot>();
 		if(delayBeforeNextShot == 0){
 			if(currentWeapon == WEAPON1){
-				list.add(new Shot(this));
-				delayBeforeNextShot = WEAPON_INTERVAL;
+				weapon1(list);
+				delayBeforeNextShot = WEAPON1_INTERVAL;
+			}else if(currentWeapon == WEAPON2){
+				weapon2(list);
+				delayBeforeNextShot = WEAPON2_INTERVAL;
+			}else if(currentWeapon == WEAPON3){
+				weapon3(list);
+				delayBeforeNextShot = WEAPON3_INTERVAL;
 			}
 		}
 		return list;
 	}
 	
+	/**
+	 * Create two shots side to side with no angle between the direction
+	 * of the shots.
+	 * @param list
+	 */
+	private void weapon1(ArrayList<Shot> list){
+		float posX;
+		float posY;
+		float angle = getFaceAllignment();
+		//Create first shot
+		angle += Math.PI/2;
+		posX = (float) (circle.getCenterX() + 5*Math.cos(angle));
+		posY = (float) (circle.getCenterY() + 5*Math.sin(angle));
+		list.add(new Shot(this, posX, posY, getFaceAllignment(), Shot.SHOT_SPEED));
+		//Create second shot
+		angle -= Math.PI;
+		posX = (float) (circle.getCenterX() + 5*Math.cos(angle));
+		posY = (float) (circle.getCenterY() + 5*Math.sin(angle));
+		list.add(new Shot(this, posX, posY, getFaceAllignment(), Shot.SHOT_SPEED));
+	}
+	
+	private void weapon2(ArrayList<Shot> list){
+		float posX = circle.getCenterX();
+		float posY = circle.getCenterY();
+		float angle = getFaceAllignment();
+		//Create first shot
+		list.add(new Shot(this, posX, posY, angle, Shot.SHOT_SPEED*1.4f));
+		//Create second shot
+		angle += Math.PI/32;
+		list.add(new Shot(this, posX, posY, angle, Shot.SHOT_SPEED*1.2f));
+		//Create third shot
+		angle -= Math.PI/16;
+		list.add(new Shot(this, posX, posY, angle, Shot.SHOT_SPEED*1.2f));
+	}
+	
+	private void weapon3(ArrayList<Shot> list){
+		float posX = circle.getCenterX();
+		float posY = circle.getCenterY();
+		float angle = getFaceAllignment();
+		//Create first shot
+		list.add(new Shot(this, posX, posY, angle, Shot.SHOT_SPEED));
+		//Create second shot
+		angle += Math.PI/64;
+		list.add(new Shot(this, posX, posY, angle, Shot.SHOT_SPEED));
+		//Create third shot
+		angle += Math.PI/64;
+		list.add(new Shot(this, posX, posY, angle, Shot.SHOT_SPEED*0.95f));
+		//Create third shot
+		angle -= (Math.PI/32 + Math.PI/64);
+		list.add(new Shot(this, posX, posY, angle, Shot.SHOT_SPEED));
+		//Create third shot
+		angle -= Math.PI/64;
+		list.add(new Shot(this, posX, posY, angle, Shot.SHOT_SPEED*0.95f));
+	}
+	
+	/**
+	 * Update the player movement direction
+	 * @param input The input...
+	 */
 	public void setDirection(Input input){
 		directionX = 0;
 		directionY = 0;
@@ -193,38 +264,6 @@ public class PlayerShip extends GwrObject{
 			directionX++;
 		}
 	}
-	
-	/*public void wantDirectionDOWN(boolean wantDown) {
-		if(wantDown) {
-			directionY++;
-		} else {
-			directionY--;
-		} 
-	}
-
-	public void wantDirectionUP(boolean wantUp) {
-		if(wantUp) {
-			directionY--;
-		} else {
-			directionY++;
-		} 
-	}
-
-	public void wantDirectionRIGHT(boolean wantRight) {
-		if(wantRight) {
-			directionX++;
-		} else {
-			directionX--;
-		} 
-	}
-
-	public void wantDirectionLEFT(boolean wantLeft) {
-		if(wantLeft) {
-			directionX--;
-		} else {
-			directionX++;
-		} 
-	}*/
 	
 	public void wantUseBomb() {
 		if (bombs > 1) {

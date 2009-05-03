@@ -6,9 +6,9 @@ public abstract class Enemy extends GwrObject{
 
 	//set active when we add object to map (e.g. we could create it and set coordinates beforehand)
 	protected boolean active = false;
-	// indicate that object is dead and will be removed soon
+	/** indicate that object is dead and will be removed soon */
 	protected boolean dead = false;
-	//enemy type (snake, hole, pacman, etc)
+	/** enemy type (snake, hole, pacman, etc) */
 	protected String type = "";
 	/** The score that this enemy worth */
 	protected int score;
@@ -33,7 +33,7 @@ public abstract class Enemy extends GwrObject{
 	 */
 	public void checkForCollision(Level level){
 		if(!level.pship.isAlive()){
-			return;
+			return; //All enemies will be clear, no need to check for collision
 		}
 		
 		//Collision with the ship
@@ -58,21 +58,23 @@ public abstract class Enemy extends GwrObject{
 
 		//For every shot
 		for(Shot shot : level.shots){
-			//Get the position of the shot
-			float shotX = shot.getCircle().getCenterX();
-			float shotY = shot.getCircle().getCenterY();
-			//Get the total radius of the enemy's circle + shot's circle
-			totalRadius = circle.getRadius() + shot.getCircle().getRadius();
-			//Calculate the distance between the enemy and the shot
-			deltaX = enemyX - shotX;
-			deltaY = enemyY - shotY;
-			distance = (float) Math.sqrt(deltaX*deltaX + deltaY*deltaY);
+			if(shot.getCanHit()){
+				//Get the position of the shot
+				float shotX = shot.getCircle().getCenterX();
+				float shotY = shot.getCircle().getCenterY();
+				//Get the total radius of the enemy's circle + shot's circle
+				totalRadius = circle.getRadius() + shot.getCircle().getRadius();
+				//Calculate the distance between the enemy and the shot
+				deltaX = enemyX - shotX;
+				deltaY = enemyY - shotY;
+				distance = (float) Math.sqrt(deltaX*deltaX + deltaY*deltaY);
 
-			//Check if we have a collision
-			if(distance < totalRadius){
-				hited(level);
-				level.shotsToRemove.add(shot);
-				return;
+				//Check if we have a collision
+				if(distance < totalRadius){
+					hited(level);
+					shot.hited(level);
+					return;
+				}
 			}
 		}
 		
@@ -162,7 +164,6 @@ public abstract class Enemy extends GwrObject{
 
 	// when enemy is died (display animation, remove object)
 	public void died(Level level) {
-		level.enemiesToRemove.add(this);
 		dead = true;
 	}
 
