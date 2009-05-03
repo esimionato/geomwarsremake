@@ -1,5 +1,7 @@
 package geomwarsremake.objects;
 
+import geomwarsremake.states.IngameState;
+
 import java.util.ArrayList;
 
 import org.newdawn.slick.geom.Circle;

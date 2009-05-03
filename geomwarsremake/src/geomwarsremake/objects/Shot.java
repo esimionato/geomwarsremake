@@ -1,7 +1,10 @@
 package geomwarsremake.objects;
 
 import geomwarsremake.objects.enemies.AttractionHole;
+import geomwarsremake.states.IngameState;
 
+import org.newdawn.slick.SlickException;
+import org.newdawn.slick.Sound;
 import org.newdawn.slick.geom.Circle;
 
 public class Shot extends GwrObject{
@@ -13,6 +16,7 @@ public class Shot extends GwrObject{
 	float speedY;
 	/** Indicate if the shot can hit enemies */
 	private boolean canHit = true;
+	protected IngameState state;
 	
 	/**
 	 * @return If the shot can hit an enemy or not
@@ -25,7 +29,7 @@ public class Shot extends GwrObject{
 	 * Create a shot. The shot speed is affected by the ship movement
 	 * @param ship The ship that fired the shot.
 	 */
-	public Shot(PlayerShip ship, float posX, float posY, float directionAngle, float speed){
+	public Shot(PlayerShip ship, float posX, float posY, float directionAngle, float speed, IngameState state){
 		//Set the position of the shot
 		setCircle(new Circle(posX, posY, 5));
 		
@@ -38,7 +42,9 @@ public class Shot extends GwrObject{
 		setSpeed((float) Math.sqrt(speedX*speedX + speedY*speedY));
 		//Set weight
 		weight = 10;
+		this.state=state;
 	}
+	
 
 	@Override
 	/**
@@ -122,6 +128,7 @@ public class Shot extends GwrObject{
 	 */
 	public void hited(Level level){
 		canHit = false;
+		state.playHit();
 	}
 	
 	/**

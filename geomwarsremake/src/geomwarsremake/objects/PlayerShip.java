@@ -1,6 +1,7 @@
 package geomwarsremake.objects;
 
 import geomwarsremake.objects.enemies.AttractionHole;
+import geomwarsremake.states.IngameState;
 
 import java.util.ArrayList;
 
@@ -29,10 +30,13 @@ public class PlayerShip extends GwrObject{
 	//Ship speed
 	private float speedX = 0;
 	private float speedY = 0;
+	
+	protected IngameState state;
 
-	public PlayerShip(){
+	public PlayerShip(IngameState state){
 		setCircle(new Circle(400, 400, 10));
 		setSpeed(0.3f);
+		this.state=state;
 	}
 
 	public int getScores() {
@@ -202,12 +206,12 @@ public class PlayerShip extends GwrObject{
 		angle += Math.PI/2;
 		posX = (float) (circle.getCenterX() + 5*Math.cos(angle));
 		posY = (float) (circle.getCenterY() + 5*Math.sin(angle));
-		list.add(new Shot(this, posX, posY, getFaceAllignment(), Shot.SHOT_SPEED));
+		list.add(new Shot(this, posX, posY, getFaceAllignment(), Shot.SHOT_SPEED, state));
 		//Create second shot
 		angle -= Math.PI;
 		posX = (float) (circle.getCenterX() + 5*Math.cos(angle));
 		posY = (float) (circle.getCenterY() + 5*Math.sin(angle));
-		list.add(new Shot(this, posX, posY, getFaceAllignment(), Shot.SHOT_SPEED));
+		list.add(new Shot(this, posX, posY, getFaceAllignment(), Shot.SHOT_SPEED, state));
 	}
 	
 	private void weapon2(ArrayList<Shot> list){
@@ -215,13 +219,13 @@ public class PlayerShip extends GwrObject{
 		float posY = circle.getCenterY();
 		float angle = getFaceAllignment();
 		//Create first shot
-		list.add(new Shot(this, posX, posY, angle, Shot.SHOT_SPEED*1.4f));
+		list.add(new Shot(this, posX, posY, angle, Shot.SHOT_SPEED*1.4f, state));
 		//Create second shot
 		angle += Math.PI/32;
-		list.add(new Shot(this, posX, posY, angle, Shot.SHOT_SPEED*1.2f));
+		list.add(new Shot(this, posX, posY, angle, Shot.SHOT_SPEED*1.2f, state));
 		//Create third shot
 		angle -= Math.PI/16;
-		list.add(new Shot(this, posX, posY, angle, Shot.SHOT_SPEED*1.2f));
+		list.add(new Shot(this, posX, posY, angle, Shot.SHOT_SPEED*1.2f, state));
 	}
 	
 	private void weapon3(ArrayList<Shot> list){
@@ -229,19 +233,19 @@ public class PlayerShip extends GwrObject{
 		float posY = circle.getCenterY();
 		float angle = getFaceAllignment();
 		//Create first shot
-		list.add(new Shot(this, posX, posY, angle, Shot.SHOT_SPEED));
+		list.add(new Shot(this, posX, posY, angle, Shot.SHOT_SPEED, state));
 		//Create second shot
 		angle += Math.PI/64;
-		list.add(new Shot(this, posX, posY, angle, Shot.SHOT_SPEED));
+		list.add(new Shot(this, posX, posY, angle, Shot.SHOT_SPEED, state));
 		//Create third shot
 		angle += Math.PI/64;
-		list.add(new Shot(this, posX, posY, angle, Shot.SHOT_SPEED*0.95f));
+		list.add(new Shot(this, posX, posY, angle, Shot.SHOT_SPEED*0.95f, state));
 		//Create third shot
 		angle -= (Math.PI/32 + Math.PI/64);
-		list.add(new Shot(this, posX, posY, angle, Shot.SHOT_SPEED));
+		list.add(new Shot(this, posX, posY, angle, Shot.SHOT_SPEED, state));
 		//Create third shot
 		angle -= Math.PI/64;
-		list.add(new Shot(this, posX, posY, angle, Shot.SHOT_SPEED*0.95f));
+		list.add(new Shot(this, posX, posY, angle, Shot.SHOT_SPEED*0.95f, state));
 	}
 	
 	/**

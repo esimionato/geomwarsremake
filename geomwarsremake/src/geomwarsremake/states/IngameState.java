@@ -10,6 +10,7 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.Music;
 import org.newdawn.slick.SlickException;
+import org.newdawn.slick.Sound;
 import org.newdawn.slick.particles.ConfigurableEmitter;
 import org.newdawn.slick.state.StateBasedGame;
 
@@ -25,6 +26,8 @@ public class IngameState extends GwarState {
 	float height;
 	private boolean soundEnabled = false;
 	private Music music;
+	private Sound sHit;
+
 
 	public IngameState(GeomWarsRemake ctx, int stateID) {
 		super(ctx, stateID);
@@ -36,11 +39,18 @@ public class IngameState extends GwarState {
 	
 	@Override
 	public void initState(GameContainer c) throws SlickException {
-		setBackground(new Color(87, 146, 186));  
+		setBackground(new Color(87, 146, 186));
 		c.setMaximumLogicUpdateInterval(50);
 		width = c.getWidth();
 		height = c.getHeight();
 		music = new Music("resources/sounds/drum.ogg");
+		sHit = new Sound("resources/sounds/pop2.ogg");
+	}
+	
+	public void playHit() {
+	  if (soundEnabled){
+	    sHit.play();
+	  }
 	}
 
 	@Override
@@ -168,15 +178,22 @@ public class IngameState extends GwarState {
 
 	public void startState(GameContainer container) throws SlickException {
 
-		level = new Level();
+		level = new Level(this);
 		level.load();
 
 		ConfigurableEmitter.setRelativePath("data");
 
 	}
 	
-	public void toggleSound() {
+	/**
+	 * 
+	 * @param disableSound - if false, always disable sound
+	 */
+	public void toggleSound(boolean disableSound) {
 	  soundEnabled = !soundEnabled;
+	  if (disableSound == false) {
+	    soundEnabled = false;
+	  }
 	  if (soundEnabled){
 	    music.loop();
 	  } else {
@@ -191,11 +208,12 @@ public class IngameState extends GwarState {
 		super.keyPressed(key, c);
 		if (key == Input.KEY_R)
 		{
-			level = new Level();
+			level = new Level(this);
 			level.load();
 		}
 		if (key == Input.KEY_ESCAPE)
 		{
+		  toggleSound(false);
 			setStarted(false);
 			getContext().enterState(GeomWarsRemake.MENU_STATE);
 		}
@@ -208,7 +226,7 @@ public class IngameState extends GwarState {
 		super.keyReleased(key, c);
 		if(key == Input.KEY_M)
 		{
-			toggleSound();
+			toggleSound(true);
 		}
 	}
 	

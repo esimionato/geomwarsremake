@@ -4,6 +4,7 @@ import geomwarsremake.objects.enemies.AttractionHole;
 import geomwarsremake.objects.enemies.BlueLozenge;
 import geomwarsremake.objects.enemies.GreenSquare;
 import geomwarsremake.objects.enemies.PinkSquare;
+import geomwarsremake.states.IngameState;
 
 import java.util.ArrayList;
 
@@ -11,7 +12,8 @@ import java.util.ArrayList;
  *  Main datastructure for game. Contains all other objects.
  */
 public class Level {
-	public PlayerShip pship;
+
+  public PlayerShip pship;
 	public ArrayList<Enemy> enemies = new ArrayList<Enemy>();
 	public ArrayList<Shot> shots = new ArrayList<Shot>();
 	//Attraction hole are also contains in the Enemy list. This list is to help
@@ -21,8 +23,14 @@ public class Level {
 	public int mapWidth = 1000;
 	public int mapHeight = 800;
 	
+	protected IngameState state;
+	
+	 public Level(IngameState state) {
+	    this.state = state;
+	  }
+	
 	public void load() {
-		pship = new PlayerShip();
+		pship = new PlayerShip(state);
 		addEnemy(new BlueLozenge(400,0));
 		addEnemy(new GreenSquare(0, 400));
 		addEnemy(new PinkSquare(800, 400));

@@ -1,6 +1,7 @@
 package geomwarsremake.objects;
 
 import geomwarsremake.objects.enemies.AttractionHole;
+import geomwarsremake.states.IngameState;
 
 public abstract class Enemy extends GwrObject{
 
@@ -165,6 +166,7 @@ public abstract class Enemy extends GwrObject{
 	// when enemy is died (display animation, remove object)
 	public void died(Level level) {
 		dead = true;
+
 	}
 
 	public boolean isDead() {
