@@ -1,19 +1,18 @@
 package geomwarsremake.objects.enemies;
 
+import org.newdawn.slick.Graphics;
 import org.newdawn.slick.geom.Circle;
 
 import util.GeomWarUtil;
 
 import geomwarsremake.objects.Enemy;
-import geomwarsremake.objects.Level;
-import geomwarsremake.objects.Shot;
 
 public class BlueLozenge extends Enemy {
 	
 	private static final float INITIAL_SPEED = 0.1f;
 	private static final float SPEED_INCREASE_PER_SECOND = 0.002f;
 	
-	private int timeForNextSpeedUpdate = 1000;
+	private int timeBeforeNextSpeedUpdate = 1000;
 
 	/**
 	 * Create a BlueLozenge at the specified position;
@@ -21,7 +20,7 @@ public class BlueLozenge extends Enemy {
 	 * @param posY The position on the y axis.
 	 */
 	public BlueLozenge(int posX, int posY){
-		setCircle(new Circle(posX, posY, 10));
+		setCircle(new Circle(posX, posY, 12));
 		setSpeed(INITIAL_SPEED);
 		weight = 2;
 		score = 25;
@@ -29,6 +28,20 @@ public class BlueLozenge extends Enemy {
 	
 	public boolean isInstanceOf(Enemy enemy){
 		return enemy instanceof BlueLozenge;
+	}
+	
+	public void draw(Graphics g, boolean debug){
+		if(state.blueLozenge != null){
+			float scaling = 1.1f;
+			float width = state.blueLozenge.getWidth()*scaling;
+			float height = state.blueLozenge.getHeight()*scaling;
+			state.blueLozenge.draw(circle.getCenterX()-width/2, circle.getCenterY()-height/2, scaling);
+			if(debug){
+				g.draw(circle);
+			}
+		}else{
+			g.draw(circle);
+		}
 	}
 	
 	@Override
@@ -40,12 +53,12 @@ public class BlueLozenge extends Enemy {
 	 * @param deltaTime The time delay since the last update.
 	 * @param level The level containing all the objects in this game.
 	 */
-	public void updatePosition(int deltaTime, Level level) {
+	public void updatePosition(int deltaTime) {
 		//Update the time before the next speed update
-		timeForNextSpeedUpdate -= deltaTime;
+		timeBeforeNextSpeedUpdate -= deltaTime;
 		//If it's time to update the speed, do it
-		while(timeForNextSpeedUpdate < 0){
-			timeForNextSpeedUpdate += 1000;
+		while(timeBeforeNextSpeedUpdate < 0){
+			timeBeforeNextSpeedUpdate += 1000;
 			setSpeed(getSpeed() + SPEED_INCREASE_PER_SECOND);
 		}
 		//Get the position of the BlueLozenge
@@ -84,10 +97,5 @@ public class BlueLozenge extends Enemy {
 		float newX = circle.getX() + deltaX;
 		float newY = circle.getY() + deltaY;
 		getCircle().setLocation(newX, newY);
-	}
-
-	public void hited(){
-		//set as not active, remove from play field
-		dead = true;
 	}
 }

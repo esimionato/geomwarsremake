@@ -7,10 +7,12 @@ import org.apache.log4j.Logger;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
+import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.Music;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.Sound;
+import org.newdawn.slick.geom.Circle;
 import org.newdawn.slick.particles.ConfigurableEmitter;
 import org.newdawn.slick.state.StateBasedGame;
 
@@ -24,9 +26,15 @@ public class IngameState extends GwarState {
 	float width;
 	/** GameContainer height */
 	float height;
+	//Sound variable
 	private boolean soundEnabled = false;
 	private Music music;
 	private Sound sHit;
+	//Image
+	public Image shipImage;
+	public Image blueLozenge;
+	public Image greenSquare;
+	public Image shot;
 
 
 	public IngameState(GeomWarsRemake ctx, int stateID) {
@@ -43,6 +51,13 @@ public class IngameState extends GwarState {
 		c.setMaximumLogicUpdateInterval(50);
 		width = c.getWidth();
 		height = c.getHeight();
+		
+		//Load image
+		shipImage = new Image("resources/images/PlayerShip.png");
+		blueLozenge = new Image("resources/images/blueLozenge.png");
+		greenSquare = new Image("resources/images/GreenSquare.png");
+		shot = new Image("resources/images/Shot.png");
+		
 		music = new Music("resources/sounds/drum.ogg");
 		sHit = new Sound("resources/sounds/pop2.ogg");
 	}
@@ -70,23 +85,34 @@ public class IngameState extends GwarState {
 		g.drawRect(0, 0, level.mapWidth, level.mapHeight);
 		
 
+		//Draw bombs
+		for(Bomb bomb : level.bombs){
+			bomb.draw(g);
+		}
+		
+		
 		//draw enemies
 		//Temporary
 		g.setColor(Color.magenta);
 		for(Enemy enemy : level.enemies){
-			g.draw(enemy.getCircle());
+			//g.draw(enemy.getCircle());
+			enemy.draw(g);
 		}
 
 		//draw shots
 		g.setColor(Color.blue);
 		for(Shot shot : level.shots){
-			g.draw(shot.getCircle());
+			//g.draw(shot.getCircle());
+			shot.draw(g);
 			//g.drawString(""+shot.timeRemain, shot.getCircle().getMaxX(), shot.getCircle().getMinY());
 		}
 
 		//draw player
 		g.setColor(Color.green);
-		g.fill(level.pship.getCircle());
+		//g.fill(level.pship.getCircle());
+		level.pship.draw(g);
+		//Circle circle = level.pship.getCircle();
+		//shipImage.draw(circle.getX(), circle.getY(), 0.5f);
 		
 		//draw direction
 		g.setColor(Color.red);
@@ -109,8 +135,7 @@ public class IngameState extends GwarState {
 		g.drawString("life "+level.pship.getNumberOfLife(), 200, 20);
 		g.drawString("bomb "+level.pship.getNumberOfBomb(), 300, 20);
 		g.drawString("Score: "+level.pship.getScores(), 900, 700);
-		//g.drawString("mouseX "+mouseX, 300, 20);
-		//g.drawString("mouseY "+mouseY, 300, 40);
+		g.drawString("Time : " + level.totalTime/1000, 400, 20);
 		g.setColor(Color.black);
 	}
 
@@ -131,11 +156,12 @@ public class IngameState extends GwarState {
 		
 		//Update ship direction movement
 		level.pship.setDirection(input);
+		level.pship.updateDrawingDirection(delta);
 		
 
 		//move player
-		level.pship.updatePosition(delta, level);
-		level.pship.collisionMapArea(level);
+		level.pship.updatePosition(delta);
+		level.pship.collisionMapArea();
 		
 		//Update shooting direction
 		float x = input.getMouseX() - width/2;
@@ -146,31 +172,41 @@ public class IngameState extends GwarState {
 		level.pship.updateShotTime(delta);
 		if(input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)){
 			for(Shot shot : level.pship.createShot()){
-				level.shots.add(shot);
+				level.addObject(shot);
 			}
 		}
 		
 		//Use bomb
+		level.pship.updateBombTime(delta);
 		if(input.isMouseButtonDown(Input.MOUSE_RIGHT_BUTTON)){
 			level.pship.wantUseBomb();
 		}
+		//Update bomb
+		for(Bomb bomb : level.bombs){
+			bomb.update(delta);
+		}
+		
+		//Create enemies
+		level.updateGenerator(delta);
 		
 		//move enemies and check for collision
 		for(Enemy enemy : level.enemies){
-			enemy.updatePosition(delta, level);
-			enemy.collisionMapArea(level);
-			enemy.checkForCollision(level);
+			enemy.updateActivationTime(delta);
+			enemy.updatePosition(delta);
+			enemy.collisionMapArea();
+			enemy.checkForCollision();
 		}
 
 		//move shots and check for collision
 		for(Shot shot : level.shots){
-			shot.updatePosition(delta, level);
-			shot.collisionMapArea(level);
-			shot.checkForCollision(level);
+			shot.updatePosition(delta);
+			shot.collisionMapArea();
+			shot.checkForCollision();
 		}
 		
 		//Remove dead objects
 		level.removeDeadObjects();
+		level.addEnemies();
 		
 		//other
 

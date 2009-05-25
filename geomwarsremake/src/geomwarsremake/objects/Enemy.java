@@ -1,12 +1,15 @@
 package geomwarsremake.objects;
 
+import org.newdawn.slick.Graphics;
+
 import geomwarsremake.objects.enemies.AttractionHole;
 import geomwarsremake.states.IngameState;
 
 public abstract class Enemy extends GwrObject{
 
-	//set active when we add object to map (e.g. we could create it and set coordinates beforehand)
+	/** Indicate that the object can hit the ship */
 	protected boolean active = false;
+	protected int delayBeforeActivation = 300;
 	/** indicate that object is dead and will be removed soon */
 	protected boolean dead = false;
 	/** enemy type (snake, hole, pacman, etc) */
@@ -14,14 +17,21 @@ public abstract class Enemy extends GwrObject{
 	/** The score that this enemy worth */
 	protected int score;
 	
+	/** Indicate if 2 enemy of the same sort can be above each other */
+	protected boolean canOverlap = false;
+	
 	public int getScore(){
 		return score;
+	}
+	
+	public void draw(Graphics g, boolean debug){
+		g.draw(circle);
 	}
 
 	public abstract boolean isInstanceOf(Enemy enemy);
 
 	@Override
-	public abstract void updatePosition(int deltaTime, Level level);
+	public abstract void updatePosition(int deltaTime);
 
 	@Override
 	/**
@@ -32,28 +42,42 @@ public abstract class Enemy extends GwrObject{
 	 * - Attraction holes 
 	 * @param level The level containing all the objects in this game.
 	 */
-	public void checkForCollision(Level level){
+	public void checkForCollision(){
 		if(!level.pship.isAlive()){
 			return; //All enemies will be clear, no need to check for collision
 		}
 		
-		//Collision with the ship
 		//Get the position of the enemy
 		float enemyX = circle.getCenterX();
 		float enemyY = circle.getCenterY();
-		//Get the position of the ship
-		float shipX = level.pship.getCircle().getCenterX();
-		float shipY = level.pship.getCircle().getCenterY();
-		//Get the total radius of the enemy's circle + ship's circle
-		float totalRadius = circle.getRadius() + level.pship.getCircle().getRadius();
-		//Calculate the distance between the enemy and the shot
-		float deltaX = enemyX - shipX;
-		float deltaY = enemyY - shipY;
-		float distance = (float) Math.sqrt(deltaX*deltaX + deltaY*deltaY);
-		//Check if we have a collision
-		if(distance < totalRadius){
-			level.pship.died();
-			return;
+		//Collision with the ship
+		if(active){
+			//Get the position of the ship
+			float shipX = level.pship.getCircle().getCenterX();
+			float shipY = level.pship.getCircle().getCenterY();
+			//Get the total radius of the enemy's circle + ship's circle
+			float totalRadius = circle.getRadius() + level.pship.getCircle().getRadius();
+			//Calculate the distance between the enemy and the shot
+			float deltaX = enemyX - shipX;
+			float deltaY = enemyY - shipY;
+			float distance = (float) Math.sqrt(deltaX*deltaX + deltaY*deltaY);
+			//Check if we have a collision
+			if(distance < totalRadius){
+				level.pship.died();
+				return;
+			}
+		}
+		
+		//Collision with a bomb
+		Bomb bomb;
+		for(int i=0; i<level.bombs.size(); i++){
+			bomb = level.bombs.get(i);
+			float difX = bomb.getX() - enemyX;
+			float difY = bomb.getY() - enemyY;
+			float distance2 = (float) Math.sqrt(difX*difX + difY*difY);
+			if(distance2 < bomb.getOuterRadius() && distance2 > bomb.getInnerRadius()){
+				died();
+			}
 		}
 
 
@@ -64,16 +88,16 @@ public abstract class Enemy extends GwrObject{
 				float shotX = shot.getCircle().getCenterX();
 				float shotY = shot.getCircle().getCenterY();
 				//Get the total radius of the enemy's circle + shot's circle
-				totalRadius = circle.getRadius() + shot.getCircle().getRadius();
+				float totalRadius = circle.getRadius() + shot.getCircle().getRadius();
 				//Calculate the distance between the enemy and the shot
-				deltaX = enemyX - shotX;
-				deltaY = enemyY - shotY;
-				distance = (float) Math.sqrt(deltaX*deltaX + deltaY*deltaY);
+				float deltaX = enemyX - shotX;
+				float deltaY = enemyY - shotY;
+				float distance = (float) Math.sqrt(deltaX*deltaX + deltaY*deltaY);
 
 				//Check if we have a collision
 				if(distance < totalRadius){
-					hited(level);
-					shot.hited(level);
+					hited();
+					shot.hited();
 					return;
 				}
 			}
@@ -82,17 +106,17 @@ public abstract class Enemy extends GwrObject{
 		//For every enemy
 		for(Enemy enemy : level.enemies){
 			if(!enemy.isDead()){
-				if(this.isInstanceOf(enemy)){
+				if(this.isInstanceOf(enemy) && !canOverlap){
 					if(enemy != this){
 						//Get the position of the blue
 						float blueX = enemy.getCircle().getCenterX();
 						float blueY = enemy.getCircle().getCenterY();
 						//Get the total radius of the enemy's circle + blue's circle
-						totalRadius = circle.getRadius() + enemy.getCircle().getRadius();
+						float totalRadius = circle.getRadius() + enemy.getCircle().getRadius();
 						//Calculate the distance between the enemy and the blue
-						deltaX = enemyX - blueX;
-						deltaY = enemyY - blueY;
-						distance = (float) Math.sqrt(deltaX*deltaX + deltaY*deltaY);
+						float deltaX = enemyX - blueX;
+						float deltaY = enemyY - blueY;
+						float distance = (float) Math.sqrt(deltaX*deltaX + deltaY*deltaY);
 
 						//Check if we have a collision
 						if(distance < totalRadius){
@@ -106,16 +130,16 @@ public abstract class Enemy extends GwrObject{
 						float holeX = hole.getCircle().getCenterX();
 						float holeY = hole.getCircle().getCenterY();
 						//Get the total radius of the hole's circle
-						totalRadius = hole.getCircle().getRadius() + circle.getRadius();
+						float totalRadius = hole.getCircle().getRadius() + circle.getRadius();
 						//Calculate the distance between the enemy and the hole
-						deltaX = enemyX - holeX;
-						deltaY = enemyY - holeY;
-						distance = (float) Math.sqrt(deltaX*deltaX + deltaY*deltaY);
+						float deltaX = enemyX - holeX;
+						float deltaY = enemyY - holeY;
+						float distance = (float) Math.sqrt(deltaX*deltaX + deltaY*deltaY);
 
 						//Check if we have a collision
 						if(distance < totalRadius){
 							hole.absorbEnemy(this);
-							died(level);
+							died();
 							break;
 						}
 					}
@@ -158,19 +182,27 @@ public abstract class Enemy extends GwrObject{
 	 * called when enemy is hitted by shot
 	 * maybe we should give coordinate of hit, so object will recognize where it was hitted
 	 */
-	public void hited(Level level){
+	public void hited(){
 		level.pship.addScores(this.score);
-		died(level);
+		died();
 	}
 
-	// when enemy is died (display animation, remove object)
-	public void died(Level level) {
+	/** when enemy is died (display animation, remove object) */
+	public void died() {
 		dead = true;
 
 	}
 
 	public boolean isDead() {
 		return dead;
+	}
+	
+	public void updateActivationTime(int deltaTime){
+		delayBeforeActivation -= deltaTime;
+		if(delayBeforeActivation <= 0){
+			active = true;
+			delayBeforeActivation = 0;
+		}
 	}
 
 }

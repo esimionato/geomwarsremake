@@ -11,7 +11,9 @@ public class AttractionHole extends Enemy {
 	public boolean isAttracting = false;
 	
 	private float attractionRadius = 600;
-	private float attractionForce = 10;
+	private float attractionForce = 1000;
+	
+	private int life = 6;
 	
 	/**
 	 * Create an AttractionHole at the specified position;
@@ -34,19 +36,50 @@ public class AttractionHole extends Enemy {
 	
 	public float getAttractionForce(float distance){
 		//This formula is subject to change
-		return (float) (attractionForce * Math.pow((attractionRadius - distance)/attractionRadius, 2));
+		float dist = distance;
+		if(dist < 15){
+			dist = 15;
+		}
+		float force = attractionForce / (dist);
+		return force;
 	}
 	
 	public void absorbEnemy(Enemy enemy){
 		score += enemy.getScore();
+		life++;
+		if(life >= 10){
+			explode();
+			died();
+		}
 	}
 	
 	@Override
-	public void hited(Level level){
+	public void hited(){
 		if(!isAttracting){
 			isAttracting = true;
 		}else{
-			super.hited(level);
+			life--;
+			if(life <= 0){
+				super.hited();
+			}
+		}
+	}
+	
+	/**
+	 * Create 10 AttractionHoleChildren and throw them in different direction
+	 */
+	private void explode(){
+		int thisX = (int) circle.getCenterX();
+		int thisY = (int) circle.getCenterY();
+		for(int i=0; i<10; i++){
+			float angle = (float) ((i/10.0) * (2*Math.PI));
+			float speedX = (float) (0.45 * Math.cos(angle));
+			float speedY = (float) (0.45 * Math.sin(angle));
+			System.out.println(speedX + " " + speedY);
+			AttractionHoleChildren ahc = new AttractionHoleChildren(thisX, thisY);
+			ahc.setSpeedX(speedX);
+			ahc.setSpeedY(speedY);
+			level.enemiesToAdd.add(ahc);
 		}
 	}
 
@@ -58,7 +91,7 @@ public class AttractionHole extends Enemy {
 	 * @param deltaTime The time delay since the last update.
 	 * @param level The level containing all the objects in this game.
 	 */
-	public void updatePosition(int deltaTime, Level level) {
+	public void updatePosition(int deltaTime) {
 		//Get the position of the AttractionHole
 		float thisX = circle.getCenterX();
 		float thisY = circle.getCenterY();

@@ -12,7 +12,7 @@ public class Pacman extends Enemy {
 	}
 
 	@Override
-	public void updatePosition(int deltaTime, Level level) {
+	public void updatePosition(int deltaTime) {
 		// TODO Auto-generated method stub
 		
 	}

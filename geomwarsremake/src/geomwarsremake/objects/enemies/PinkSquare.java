@@ -8,7 +8,7 @@ import geomwarsremake.objects.Level;
 
 public class PinkSquare extends Enemy {
 	
-	private final float MAX_SPEED = 0.4f;
+	private final float MAX_SPEED = 0.3f;
 	private final float ACCELERATION = 0.01f;
 
 	public PinkSquare(int posX, int posY){
@@ -22,7 +22,7 @@ public class PinkSquare extends Enemy {
 	}
 	
 	@Override
-	public void updatePosition(int deltaTime, Level level) {
+	public void updatePosition(int deltaTime) {
 		//Get the position of the Pink
 		float pinkX = circle.getCenterX();
 		float pinkY = circle.getCenterY();
@@ -65,6 +65,23 @@ public class PinkSquare extends Enemy {
 		float newX = circle.getX() + deltaX;
 		float newY = circle.getY() + deltaY;
 		getCircle().setLocation(newX, newY);
+	}
+	
+	public void hited(){
+		level.pship.addScores(this.score);
+		died();
+		//Create 3 children
+		int dist = 80;
+		float pinkX = circle.getCenterX();
+		float pinkY = circle.getCenterY();
+		float randomAngle = (float) (Math.random()*Math.PI*2);
+		for(int i=0; i<3; i++){
+			float angle = (float) (randomAngle + Math.PI*2*i/3);
+			float posX = (float) (pinkX + Math.cos(angle)*dist);
+			float posY = (float) (pinkY + Math.sin(angle)*dist);
+			float positionAngle = (float) (Math.random()*360);
+			level.enemiesToAdd.add(new PinkSquareChildren(posX, posY, positionAngle));
+		}
 	}
 
 }

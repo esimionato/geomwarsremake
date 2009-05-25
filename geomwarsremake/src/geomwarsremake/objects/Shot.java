@@ -3,35 +3,29 @@ package geomwarsremake.objects;
 import geomwarsremake.objects.enemies.AttractionHole;
 import geomwarsremake.states.IngameState;
 
+import org.newdawn.slick.Graphics;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.Sound;
 import org.newdawn.slick.geom.Circle;
+
+import util.GeomWarUtil;
 
 public class Shot extends GwrObject{
 	
 	public static final float SHOT_SPEED = 0.6f;
 	
-	//Shot speed
-	float speedX;
-	float speedY;
 	/** Indicate if the shot can hit enemies */
 	private boolean canHit = true;
-	protected IngameState state;
-	
-	/**
-	 * @return If the shot can hit an enemy or not
-	 */
-	public boolean getCanHit(){
-		return canHit;
-	}
+	private float drawingAngle;
 	
 	/**
 	 * Create a shot. The shot speed is affected by the ship movement
 	 * @param ship The ship that fired the shot.
 	 */
-	public Shot(PlayerShip ship, float posX, float posY, float directionAngle, float speed, IngameState state){
+	public Shot(PlayerShip ship, float posX, float posY, float directionAngle, float speed){
 		//Set the position of the shot
 		setCircle(new Circle(posX, posY, 5));
+		drawingAngle = (float) Math.toDegrees(directionAngle);
 		
 		//Get the speed of the ship
 		float shipSpeedX = ship.getSpeedX();
@@ -42,9 +36,38 @@ public class Shot extends GwrObject{
 		setSpeed((float) Math.sqrt(speedX*speedX + speedY*speedY));
 		//Set weight
 		weight = 10;
-		this.state=state;
 	}
 	
+	/**
+	 * @return If the shot can hit an enemy or not
+	 */
+	public boolean getCanHit(){
+		return canHit;
+	}
+	
+	@Override
+	/**
+	 * Draw the ship
+	 * @param g The graphics we are drawing on.
+	 * @param debug Indicate if we are doing testing and we want to see the collision 
+	 * circle
+	 */
+	public void draw(Graphics g, boolean debug){
+		if(state.shot != null){
+			float angle = drawingAngle+90;
+			int width = state.shot.getWidth();
+			int height = state.shot.getHeight();
+			state.shot.setCenterOfRotation(width/2, height/2);
+			state.shot.rotate(angle);
+			state.shot.draw(circle.getCenterX()-width/2, circle.getCenterY()-height/2, 1f);
+			state.shot.rotate(-angle);
+			if(debug){
+				g.draw(circle);
+			}
+		}else{
+			g.draw(circle);
+		}
+	}
 
 	@Override
 	/**
@@ -54,16 +77,16 @@ public class Shot extends GwrObject{
 	 * @param deltaTime The time delay since the last update.
 	 * @param level The level containing all the objects in this game.
 	 */
-	public void updatePosition(int deltaTime, Level level) {
+	public void updatePosition(int deltaTime) {
 		//For every AttractionHole
 		for(AttractionHole hole : level.holes){
 			if(hole.isAttracting){
-				float shipX = circle.getCenterX();
-				float shipY = circle.getCenterY();
+				float shotX = circle.getCenterX();
+				float shotY = circle.getCenterY();
 				float holeX = hole.getCircle().getCenterX();
 				float holeY = hole.getCircle().getCenterY();
-				float delta2X = holeX - shipX;
-				float delta2Y = holeY - shipY;
+				float delta2X = holeX - shotX;
+				float delta2Y = holeY - shotY;
 				float distance = (float) Math.sqrt(delta2X*delta2X + delta2Y*delta2Y);
 				if(distance < hole.getAttractionRadius()){
 					//Shot is repulse by the AttractionHole
@@ -94,7 +117,7 @@ public class Shot extends GwrObject{
 	 * - Enemies
 	 * @param level The level containing all the objects in this game.
 	 */
-	public void checkForCollision(Level level) {
+	public void checkForCollision() {
 		//For every enemy
 		for(Enemy enemy : level.enemies){
 			if(!enemy.isDead()){
@@ -114,8 +137,8 @@ public class Shot extends GwrObject{
 
 				//Check if we have a collision
 				if(distance < totalRadius){
-					hited(level);
-					enemy.hited(level);
+					hited();
+					enemy.hited();
 					break;
 				}
 			}
@@ -126,7 +149,7 @@ public class Shot extends GwrObject{
 	 * Called when a shot hit an enemy
 	 * @param level
 	 */
-	public void hited(Level level){
+	public void hited(){
 		canHit = false;
 		state.playHit();
 	}
@@ -135,7 +158,7 @@ public class Shot extends GwrObject{
 	 * Called when a shot hit the map area
 	 * @param level The level containing all the object in this game
 	 */
-	public void hitMapArea(Level level){
+	public void hitMapArea(){
 		canHit = false;
 		//Add animation when the shot hit the wall
 	}
