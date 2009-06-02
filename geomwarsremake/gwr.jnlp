@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<!--<jnlp codebase="http://geomwarsremake.googlecode.com/files/" href="gwr.jnlp">-->
-<jnlp codebase="{deploy.base.url}" href="gwr.jnlp">
+<jnlp codebase="http://geomwarsremake.googlecode.com/svn/trunk/geomwarsremake/" href="gwr.jnlp">
 
   <information>
     <title>Geometry Wars REmake</title>
@@ -17,14 +16,7 @@
 
   <resources>      
     <j2se version="1.6"/>
-    <jar href="gwr.jar"/>  
-    <jar href="lib/commons-lang-2.4.jar"/>
-    <jar href="lib/log4j-1.2.15.jar"/>
-    <jar href="lib/lwjgl.jar"/>
-    <jar href="lib/slick.jar"/>
-    <jar href="lib/jinput.jar"/>
-    <jar href="lib/jogg-0.0.7.jar"/>
-    <jar href="lib/jorbis-0.0.15.jar"/>
+    <jar href="http://geomwarsremake.googlecode.com/files/gwr.jar"/>
     <property name="java.library.path" value="lib"/>
   </resources>
 
