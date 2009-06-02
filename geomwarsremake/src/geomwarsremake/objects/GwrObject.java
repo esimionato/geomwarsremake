@@ -55,7 +55,7 @@ public abstract class GwrObject {
 	}
 	
 	public void draw(Graphics g){
-		draw(g, true);
+		draw(g, false);
 	}
 	public abstract void draw(Graphics g, boolean debug);
 

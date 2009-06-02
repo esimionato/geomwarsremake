@@ -36,8 +36,10 @@ public class Level {
 		addObject(new PlayerShip());
 		initRandomEnemy();
 		//TEST ------------- TEST
-		addObject(new Spinning(0, 0));
-		addObject(new AttractionHole(200, 200));
+		//addObject(new Spinning(0, 0));
+		//addObject(new AttractionHole(200, 200));
+		//addObject(new GreenSquare(400, 0));
+		//addObject(new PinkSquare(400, 0));
 		//END OF TEST ---------- END OF TEST
 	}
 	

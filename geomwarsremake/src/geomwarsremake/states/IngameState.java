@@ -1,5 +1,7 @@
 package geomwarsremake.states;
 
+import java.util.ArrayList;
+
 import geomwarsremake.GeomWarsRemake;
 import geomwarsremake.objects.*;
 
@@ -12,9 +14,11 @@ import org.newdawn.slick.Input;
 import org.newdawn.slick.Music;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.Sound;
-import org.newdawn.slick.geom.Circle;
 import org.newdawn.slick.particles.ConfigurableEmitter;
 import org.newdawn.slick.state.StateBasedGame;
+
+import other.Firework;
+import other.ImageCreation;
 
 import util.GeomWarUtil;
 
@@ -32,10 +36,12 @@ public class IngameState extends GwarState {
 	private Sound sHit;
 	//Image
 	public Image shipImage;
-	public Image blueLozenge;
-	public Image greenSquare;
+	public Image greenImage;
 	public Image shot;
-
+	public Image pinkImage;
+	public Image spinningImage;
+	
+	public ArrayList<Firework> fireworks = new ArrayList<Firework>();
 
 	public IngameState(GeomWarsRemake ctx, int stateID) {
 		super(ctx, stateID);
@@ -53,9 +59,13 @@ public class IngameState extends GwarState {
 		height = c.getHeight();
 		
 		//Load image
+		//Load image
+		ImageCreation ic = new ImageCreation();
+		pinkImage = ic.createPinkImage();
+		greenImage = ic.createGreenImage();
+		spinningImage = ic.createSpinningImage();
+		
 		shipImage = new Image("resources/images/PlayerShip.png");
-		blueLozenge = new Image("resources/images/blueLozenge.png");
-		greenSquare = new Image("resources/images/GreenSquare.png");
 		shot = new Image("resources/images/Shot.png");
 		
 		music = new Music("resources/sounds/drum.ogg");
@@ -72,47 +82,38 @@ public class IngameState extends GwarState {
 	public void renderState(GameContainer c, Graphics g) {
 		//draw background
 		g.setColor(Color.black);
-		//g.clear();
 		
-
-
 		//Position the map
 		g.translate(getTranslateX(), getTranslateY());
 		
-		
 		//Draw map area
 		g.setColor(Color.white);
-		g.drawRect(0, 0, level.mapWidth, level.mapHeight);
-		
+		float w = g.getLineWidth();
+		int size = 10;
+		g.setLineWidth(size);
+		g.drawRect(-size/2, -size/2, level.mapWidth+size, level.mapHeight+size);
+		g.setLineWidth(w);
+		drawGrid(g);
 
 		//Draw bombs
 		for(Bomb bomb : level.bombs){
 			bomb.draw(g);
 		}
 		
-		
 		//draw enemies
-		//Temporary
-		g.setColor(Color.magenta);
 		for(Enemy enemy : level.enemies){
-			//g.draw(enemy.getCircle());
 			enemy.draw(g);
 		}
 
 		//draw shots
 		g.setColor(Color.blue);
 		for(Shot shot : level.shots){
-			//g.draw(shot.getCircle());
 			shot.draw(g);
-			//g.drawString(""+shot.timeRemain, shot.getCircle().getMaxX(), shot.getCircle().getMinY());
 		}
 
 		//draw player
 		g.setColor(Color.green);
-		//g.fill(level.pship.getCircle());
 		level.pship.draw(g);
-		//Circle circle = level.pship.getCircle();
-		//shipImage.draw(circle.getX(), circle.getY(), 0.5f);
 		
 		//draw direction
 		g.setColor(Color.red);
@@ -123,8 +124,10 @@ public class IngameState extends GwarState {
 		float dirY2 = dirY1+(float)(20*Math.sin(angle));
 		g.drawLine(dirX1, dirY1, dirX2, dirY2);
 
-
 		//draw effects
+		for(int i=0; i<fireworks.size(); i++){
+			fireworks.get(i).render(g);
+		}
 
 		//set translation back
 		g.translate(-getTranslateX(), -getTranslateY());
@@ -137,6 +140,25 @@ public class IngameState extends GwarState {
 		g.drawString("Score: "+level.pship.getScores(), 900, 700);
 		g.drawString("Time : " + level.totalTime/1000, 400, 20);
 		g.setColor(Color.black);
+	}
+	
+	private void drawGrid(Graphics g){
+		float w = g.getLineWidth();
+		float width = level.mapWidth;
+		float height = level.mapHeight;
+		g.setColor(Color.blue);
+		g.setLineWidth(1);
+		for(int i=0; i<width/40; i++){
+			g.drawLine(i*40, 0, i*40, height);
+		}
+		for(int j=0; j<height/40; j++){
+			g.drawLine(0, j*40, width, j*40);
+		}
+		g.setLineWidth(w);
+	}
+	
+	private void drawStar(Graphics g){
+		//How should I do that???
 	}
 
 	public void updateState(GameContainer container, int delta){
@@ -191,10 +213,7 @@ public class IngameState extends GwarState {
 		
 		//move enemies and check for collision
 		for(Enemy enemy : level.enemies){
-			enemy.updateActivationTime(delta);
-			enemy.updatePosition(delta);
-			enemy.collisionMapArea();
-			enemy.checkForCollision();
+			enemy.update(delta);
 		}
 
 		//move shots and check for collision
@@ -209,6 +228,13 @@ public class IngameState extends GwarState {
 		level.addEnemies();
 		
 		//other
+		for(int i=0; i<fireworks.size(); i++){
+			fireworks.get(i).update(delta);
+			if(fireworks.get(i).getTime() > fireworks.get(i).TOTAL_TIME){
+				fireworks.remove(i);
+				i--;
+			}
+		}
 
 	}
 
@@ -249,8 +275,15 @@ public class IngameState extends GwarState {
 		}
 		if (key == Input.KEY_ESCAPE)
 		{
-		  toggleSound(false);
+			toggleSound(false);
 			setStarted(false);
+			//try {
+				//greenImage.destroy();
+				//Graphics g = pinkImage.getGraphics();
+				//g.destroy();
+			//} catch (SlickException e) {
+				//e.printStackTrace();
+			//}
 			getContext().enterState(GeomWarsRemake.MENU_STATE);
 		}
 	}

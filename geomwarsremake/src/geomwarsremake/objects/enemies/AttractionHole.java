@@ -1,5 +1,7 @@
 package geomwarsremake.objects.enemies;
 
+import org.newdawn.slick.Color;
+import org.newdawn.slick.Graphics;
 import org.newdawn.slick.geom.Circle;
 
 import util.GeomWarUtil;
@@ -30,6 +32,26 @@ public class AttractionHole extends Enemy {
 		return enemy instanceof AttractionHole;
 	}
 	
+	/**
+	 * Draw this object
+	 * @param g The graphics we are drawing on.
+	 * @param debug Indicate if we are doing testing and we want to see the collision 
+	 * circle
+	 */
+	public void draw(Graphics g, boolean debug){
+		render(g);
+		g.setColor(Color.white);
+		if(debug){
+			g.draw(circle);
+		}
+	}
+	
+	public void update(int deltaTime){
+		super.update(deltaTime);
+		circle.setRadius(10 + life * 10/5);
+		updateAnimation(deltaTime);
+	}
+	
 	public float getAttractionRadius(){
 		return attractionRadius;
 	}
@@ -47,7 +69,7 @@ public class AttractionHole extends Enemy {
 	public void absorbEnemy(Enemy enemy){
 		score += enemy.getScore();
 		life++;
-		if(life >= 10){
+		if(life >= 12){
 			explode();
 			died();
 		}
@@ -107,6 +129,56 @@ public class AttractionHole extends Enemy {
 		float newX = circle.getX() + deltaX;
 		float newY = circle.getY() + deltaY;
 		getCircle().setLocation(newX, newY);
+	}
+	
+	/**
+	 * THIS PART IS ABOUT ANIMATION ONLY
+	 */
+	final int animationTime = 1500;
+	
+	int currentTime = 0;
+	
+	int size = 30;
+	int s = 2;
+	
+	final int INITIAL_RADIUS = 30;
+	final int RADIUS_GROWTH = 10;
+	
+	/** The radius of the circle */
+	private float r = 10+life*10/5;
+	
+	private void updateAnimation(int deltaTime){
+		currentTime += deltaTime;
+		currentTime = currentTime % animationTime;
+		if(isAttracting){
+			setRadius();
+		}
+	}
+	
+	private void render(Graphics g){
+		int cx = (int)circle.getCenterX();
+		int cy = (int)circle.getCenterY();
+		Circle cir = new Circle(cx, cy, r);
+		float w = g.getLineWidth();
+		g.setLineWidth(12);
+		g.setColor(Color.red);
+		g.draw(cir);
+		if(this.isAttracting){
+			g.setLineWidth(6);
+			g.setColor(Color.white);
+			g.draw(cir);
+		}
+		g.setLineWidth(w);
+	}
+	
+	private void setRadius(){
+		double var = 0;
+		if(currentTime < animationTime/2){
+			var = (1.0*currentTime/animationTime);
+		}else{
+			var = 1 - (1.0*currentTime/animationTime);
+		}
+		r = (float) (circle.getRadius() + (var*circle.getRadius()*0.5));
 	}
 
 }

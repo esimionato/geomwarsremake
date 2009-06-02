@@ -48,27 +48,7 @@ public class MenuState extends GwarState implements ComponentListener {
 	public void updateState(GameContainer c, int delta) {
 		Input input = c.getInput();
 		float mx = input.getMouseX();
-		float my = input.getMouseY();
-
-		/*if(input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)){
-			String bact="none";
-			for(GwarButton b : buttonList) {
-				bact = b.collide(mx, my);
-				if (bact.equals("exit")) {
-					System.exit(0);
-					break;
-				} else if (bact.equals("newGame")) {
-					getContext().enterState(GeomWarsRemake.INGAME_STATE,
-							this.getExitTransition(),
-							this.getEnterTransition()); 
-					break;
-				} else if (bact.equals("options")) {
-					break;
-				}
-			}
-			logger.debug("main menu MRight. bact:"+bact);
-		}*/
-		
+		float my = input.getMouseY();	
 		
 		for(GwarButton b : buttonList){
 			b.collide(mx, my);

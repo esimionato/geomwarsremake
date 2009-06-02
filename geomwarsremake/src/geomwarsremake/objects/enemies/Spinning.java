@@ -1,5 +1,7 @@
 package geomwarsremake.objects.enemies;
 
+import org.newdawn.slick.Color;
+import org.newdawn.slick.Graphics;
 import org.newdawn.slick.geom.Circle;
 
 import geomwarsremake.objects.Enemy;
@@ -17,14 +19,34 @@ public class Spinning extends Enemy {
 	 * @param posY The position on the y axis.
 	 */
 	public Spinning(int posX, int posY){
-		setCircle(new Circle(posX, posY, 12));
+		setCircle(new Circle(posX, posY, 13));
 		setSpeed(0.05f);
 		weight = 2;
 		score = 25;
+		initAnimation();
 	}
 	
 	public boolean isInstanceOf(Enemy enemy){
 		return enemy instanceof Spinning;
+	}
+	
+	/**
+	 * Draw this object
+	 * @param g The graphics we are drawing on.
+	 * @param debug Indicate if we are doing testing and we want to see the collision 
+	 * circle
+	 */
+	public void draw(Graphics g, boolean debug){
+		render(g);
+		g.setColor(Color.white);
+		if(debug){
+			g.draw(circle);
+		}
+	}
+	
+	public void update(int deltaTime){
+		super.update(deltaTime);
+		updateAnimation(deltaTime);
 	}
 
 	@Override
@@ -70,6 +92,41 @@ public class Spinning extends Enemy {
 	
 	public void hitMapArea(){
 		currentDirection = (float) (Math.random() * (2*Math.PI));
+	}
+	
+	/**
+	 * THIS PART IS ABOUT ANIMATION ONLY
+	 */
+	int animationTime = 2000;
+	
+	int currentTime = 0;
+	
+	int size = 40;
+	int s = 2;
+	
+	float rotationSpeed;
+	float angle = 0;
+	
+	private void initAnimation(){
+		animationTime -= Math.random()*1000;
+	}
+	
+	private void updateAnimation(int deltaTime){
+		currentTime += deltaTime;
+		currentTime = currentTime % animationTime;
+		state.spinningImage.setCenterOfRotation((size+s)/2, (size+s)/2);
+	}
+	
+	private void render(Graphics g){
+		int cx = (int)circle.getCenterX();
+		int cy = (int)circle.getCenterY();
+		state.spinningImage.rotate(getRotationAngle());
+		state.spinningImage.draw(cx-size/2, cy-size/2);
+		state.spinningImage.rotate(-getRotationAngle());
+	}
+	
+	private float getRotationAngle(){
+		return (float) (1.0*currentTime/animationTime * 360);
 	}
 
 }

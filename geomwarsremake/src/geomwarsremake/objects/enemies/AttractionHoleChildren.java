@@ -1,5 +1,7 @@
 package geomwarsremake.objects.enemies;
 
+import org.newdawn.slick.Color;
+import org.newdawn.slick.Graphics;
 import org.newdawn.slick.geom.Circle;
 
 import util.GeomWarUtil;
@@ -20,6 +22,21 @@ public class AttractionHoleChildren extends Enemy {
 	
 	public boolean isInstanceOf(Enemy enemy){
 		return enemy instanceof AttractionHoleChildren;
+	}
+	
+	/**
+	 * Draw this object
+	 * @param g The graphics we are drawing on.
+	 * @param debug Indicate if we are doing testing and we want to see the collision 
+	 * circle
+	 */
+	public void draw(Graphics g, boolean debug){
+		float w = g.getLineWidth();
+		g.setLineWidth(4);
+		g.setColor(new Color(205, 236, 255));
+		g.draw(circle);
+		g.setColor(Color.white);
+		g.setLineWidth(w);
 	}
 	
 	public void setSpeedX(float speedX){

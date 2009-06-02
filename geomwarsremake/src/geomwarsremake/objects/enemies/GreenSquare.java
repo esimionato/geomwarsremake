@@ -1,6 +1,8 @@
 package geomwarsremake.objects.enemies;
 
+import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
+import org.newdawn.slick.Image;
 import org.newdawn.slick.geom.Circle;
 
 import util.GeomWarUtil;
@@ -18,7 +20,7 @@ public class GreenSquare extends Enemy {
 		setCircle(new Circle(posX, posY, 13));
 		setSpeed(0.20f);
 		weight = 2;
-		score = 50;
+		score = 100;
 	}
 	
 	public boolean isInstanceOf(Enemy enemy){
@@ -26,23 +28,22 @@ public class GreenSquare extends Enemy {
 	}
 	
 	/**
-	 * Draw the ship
+	 * Draw this object
 	 * @param g The graphics we are drawing on.
 	 * @param debug Indicate if we are doing testing and we want to see the collision 
 	 * circle
 	 */
 	public void draw(Graphics g, boolean debug){
-		if(state.greenSquare != null){
-			float scaling = 0.92f;
-			float width = state.greenSquare.getWidth()*scaling;
-			float height = state.greenSquare.getHeight()*scaling;
-			state.greenSquare.draw(circle.getCenterX()-width/2, circle.getCenterY()-height/2, scaling);
-			if(debug){
-				g.draw(circle);
-			}
-		}else{
+		render(g);
+		g.setColor(Color.white);
+		if(debug){
 			g.draw(circle);
 		}
+	}
+	
+	public void update(int deltaTime){
+		super.update(deltaTime);
+		updateAnimation(deltaTime);
 	}
 	
 	public float getAvoidForce(float distance){
@@ -130,6 +131,34 @@ public class GreenSquare extends Enemy {
 		float newX = circle.getX() + deltaX;
 		float newY = circle.getY() + deltaY;
 		getCircle().setLocation(newX, newY);
+	}
+	
+	/**
+	 * THIS PART IS ABOUT ANIMATION ONLY
+	 */
+	final int animationTime = 1500;
+	
+	int currentTime = 0;
+	
+	int size = 30;
+	int s = 2;
+	
+	private void updateAnimation(int deltaTime){
+		currentTime += deltaTime;
+		currentTime = currentTime % animationTime;
+	}
+	
+	private void render(Graphics g){
+		int cx = (int)circle.getCenterX();
+		int cy = (int)circle.getCenterY();
+		state.greenImage.setCenterOfRotation((size+s)/2, (size+s)/2);
+		state.greenImage.rotate(getRotationAngle());
+		state.greenImage.draw(cx-size/2, cy-size/2);
+		state.greenImage.rotate(-getRotationAngle());
+	}
+	
+	private float getRotationAngle(){
+		return (float) (1.0*currentTime/animationTime * 360);
 	}
 
 }

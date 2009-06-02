@@ -1,5 +1,6 @@
 package geomwarsremake.objects.enemies;
 
+import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.geom.Circle;
 
@@ -20,10 +21,10 @@ public class BlueLozenge extends Enemy {
 	 * @param posY The position on the y axis.
 	 */
 	public BlueLozenge(int posX, int posY){
-		setCircle(new Circle(posX, posY, 12));
+		setCircle(new Circle(posX, posY, 13));
 		setSpeed(INITIAL_SPEED);
 		weight = 2;
-		score = 25;
+		score = 50;
 	}
 	
 	public boolean isInstanceOf(Enemy enemy){
@@ -31,18 +32,20 @@ public class BlueLozenge extends Enemy {
 	}
 	
 	public void draw(Graphics g, boolean debug){
-		if(state.blueLozenge != null){
-			float scaling = 1.1f;
-			float width = state.blueLozenge.getWidth()*scaling;
-			float height = state.blueLozenge.getHeight()*scaling;
-			state.blueLozenge.draw(circle.getCenterX()-width/2, circle.getCenterY()-height/2, scaling);
-			if(debug){
-				g.draw(circle);
-			}
-		}else{
+		render(g);
+		g.setColor(Color.white);
+		if(debug){
 			g.draw(circle);
 		}
 	}
+	
+	@Override
+	public void update(int deltaTime){
+		super.update(deltaTime);
+		currentTime += deltaTime;
+		currentTime = currentTime % animationTime;
+	}
+	
 	
 	@Override
 	/**
@@ -97,5 +100,53 @@ public class BlueLozenge extends Enemy {
 		float newX = circle.getX() + deltaX;
 		float newY = circle.getY() + deltaY;
 		getCircle().setLocation(newX, newY);
+	}
+	
+	/**
+	 * THIS PART IS ABOUT ANIMATION ONLY
+	 */
+	final int animationTime = 1500;
+	
+	final double initialWidth = 25;
+	final double initialHeight = 45;
+	final double changeWidthSpeed = 20.0/animationTime;
+	final double changeHeightSpeed = 15.0/animationTime;
+	
+	int currentTime = 0;
+	
+	public void render(Graphics g){
+		float w = g.getLineWidth();
+		int cx = (int) circle.getCenterX();
+		int cy = (int) circle.getCenterY();
+		g.setColor(new Color(80, 237, 237));
+		g.setLineWidth(6);
+		//g.setStroke(new BasicStroke(6, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+		double width = getWidth();
+		double height = getHeight();
+		//Top-Left stroke
+		g.drawLine((int)(cx-width/2), cy, cx, (int)(cy-height/2));
+		//Top-Right
+		g.drawLine(cx, (int)(cy-height/2), (int)(cx+width/2), cy);
+		//Bottom-Right
+		g.drawLine((int)(cx+width/2), cy, cx, (int)(cy+height/2));
+		//Bottom-Left
+		g.drawLine(cx, (int)(cy+height/2), (int)(cx-width/2), cy);
+		g.setLineWidth(w);
+	}
+	
+	private double getWidth(){
+		if(currentTime < animationTime/2){
+			return initialWidth +  currentTime*changeWidthSpeed;
+		}else{
+			return initialWidth + animationTime/2*changeWidthSpeed - (currentTime-animationTime/2)*changeWidthSpeed;
+		}
+	}
+	
+	private double getHeight(){
+		if(currentTime < animationTime/2){
+			return initialHeight -  currentTime*changeHeightSpeed;
+		}else{
+			return initialHeight - animationTime/2*changeHeightSpeed + (currentTime-animationTime/2)*changeHeightSpeed;
+		}
 	}
 }

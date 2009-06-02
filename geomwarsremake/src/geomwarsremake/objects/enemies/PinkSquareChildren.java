@@ -1,5 +1,7 @@
 package geomwarsremake.objects.enemies;
 
+import org.newdawn.slick.Color;
+import org.newdawn.slick.Graphics;
 import org.newdawn.slick.geom.Circle;
 
 import util.GeomWarUtil;
@@ -27,15 +29,34 @@ public class PinkSquareChildren extends Enemy {
 		float difY = (float) (DISTANCE_FROM_CENTER*Math.sin(Math.toRadians(positionAngle)));
 		float newX = posX + difX - 10;
 		float newY = posY + difY - 10;
-		setCircle(new Circle(newX, newY, 10));
+		setCircle(new Circle(newX, newY, 8));
 		
 		weight = 1;
-		score = 25;
+		score = 50;
 		setSpeed(THE_SPEED);
 	}
 	
 	public boolean isInstanceOf(Enemy enemy){
 		return enemy instanceof PinkSquareChildren;
+	}
+	
+	/**
+	 * Draw this object
+	 * @param g The graphics we are drawing on.
+	 * @param debug Indicate if we are doing testing and we want to see the collision 
+	 * circle
+	 */
+	public void draw(Graphics g, boolean debug){
+		render(g);
+		g.setColor(Color.white);
+		if(debug){
+			g.draw(circle);
+		}
+	}
+	
+	public void update(int deltaTime){
+		super.update(deltaTime);
+		updateAnimation(deltaTime);
 	}
 
 	@Override
@@ -179,6 +200,34 @@ public class PinkSquareChildren extends Enemy {
 				}
 			}
 		}
+	}
+	
+	/**
+	 * THIS PART IS ABOUT ANIMATION ONLY
+	 */
+	final int animationTime = 1500;
+	
+	int currentTime = 0;
+	
+	int size = 20;
+	int s = 1;
+	
+	private void updateAnimation(int deltaTime){
+		currentTime += deltaTime;
+		currentTime = currentTime % animationTime;
+	}
+	
+	private void render(Graphics g){
+		int cx = (int)circle.getCenterX();
+		int cy = (int)circle.getCenterY();
+		state.pinkImage.setCenterOfRotation((size+s)/2, (size+s)/2);
+		state.pinkImage.rotate(getRotationAngle());
+		state.pinkImage.draw(cx-size/2, cy-size/2, 0.6f);
+		state.pinkImage.rotate(-getRotationAngle());
+	}
+	
+	private float getRotationAngle(){
+		return (float) (1.0*currentTime/animationTime * 360);
 	}
 
 }

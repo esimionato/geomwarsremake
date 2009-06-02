@@ -2,6 +2,8 @@ package geomwarsremake.objects;
 
 import org.newdawn.slick.Graphics;
 
+import other.Firework;
+
 import geomwarsremake.objects.enemies.AttractionHole;
 import geomwarsremake.states.IngameState;
 
@@ -27,6 +29,14 @@ public abstract class Enemy extends GwrObject{
 	public void draw(Graphics g, boolean debug){
 		g.draw(circle);
 	}
+	
+	public void update(int deltaTime){
+		updatePosition(deltaTime);
+		updateActivationTime(deltaTime);
+		collisionMapArea();
+		checkForCollision();
+	}
+	
 
 	public abstract boolean isInstanceOf(Enemy enemy);
 
@@ -190,7 +200,8 @@ public abstract class Enemy extends GwrObject{
 	/** when enemy is died (display animation, remove object) */
 	public void died() {
 		dead = true;
-
+		//Firework!!!!
+		state.fireworks.add(new Firework((int)circle.getCenterX(), (int)circle.getCenterY()));
 	}
 
 	public boolean isDead() {
