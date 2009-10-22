@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<jnlp codebase="http://geomwarsremake.googlecode.com/svn/trunk/geomwarsremake/" href="gwr.jnlp">
+
+  <information>
+    <title>Geometry Wars REmake</title>
+    <vendor>we</vendor>
+    <description>geometry wars remake</description>
+    <description kind="short"></description>
+    <offline-allowed/>
+  </information>
+
+  <security>
+      <all-permissions/>
+  </security>
+
+  <resources>      
+    <j2se version="1.6"/>
+    <jar href="http://geomwarsremake.googlecode.com/files/gwr.jar"/>
+    <property name="java.library.path" value="lib"/>
+  </resources>
+
+  <application-desc main-class="geomwarsremake.GeomWarsRemake"/>
+
+</jnlp>
