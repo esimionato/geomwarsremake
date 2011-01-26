@@ -21,8 +21,8 @@ public class Bomb {
 	public Bomb(Level level){
 		posX = level.pship.getCircle().getCenterX();
 		posY = level.pship.getCircle().getCenterY();
+		System.out.println("HAHAHA");
 		outerRadius = level.pship.getCircle().getRadius();
-		System.out.println("Bonjour");
 		System.out.println("Bonjour");
 		innerRadius = 0;
 	}
