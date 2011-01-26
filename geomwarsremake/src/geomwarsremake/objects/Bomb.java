@@ -7,6 +7,7 @@ import org.newdawn.slick.geom.Circle;
 public class Bomb {
 	
 	private final int MAX_OUTER_RADIUS = 800;
+
 	private final float INCREASE_RADIUS = 0.5f;
 	private final float DIF_RADIUS = 300;
 	
@@ -19,6 +20,7 @@ public class Bomb {
 	
 	public Bomb(Level level){
 		posX = level.pship.getCircle().getCenterX();
+		System.out.println("Bonjour");
 		posY = level.pship.getCircle().getCenterY();
 		outerRadius = level.pship.getCircle().getRadius();
 		innerRadius = 0;
